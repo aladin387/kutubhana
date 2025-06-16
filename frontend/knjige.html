@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="knjige.css">
+		<title>Kitabi</title>
+		<style>
+			body { font-family: Arial, sans-serif; padding: 20px; }
+			table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+			th, td { border: 1px solid #ddd; padding: 8px; }
+			th { background-color: #f2f2f2; }
+			input, button { margin-top: 10px; display: block; }
+		</style>
+	</head>
+
+
+
+	<body>
+	
+		<h1>Kutubhana MullaSadra</h1>
+		<button id="btnPrikaziFormu">DODAJ KNJIGU</button>
+
+		<div id="modal" style="display: none;">
+			<div id="modalContent">
+				<span id="zatvoriModal" style="float: right; cursor: pointer;">&times;</span>
+				<h3>Dodaj novu knjigu</h3>
+				<label>Naslov: <input type="text" id="naslov" placeholder="Obavezno polje" /></label><br>
+				<label>Autor: <input type="text" id="autor" placeholder="Obavezno polje" /></label><br>
+				<label>Žanr: <input type="text" id="zanr" placeholder="Opcionalno" /></label><br>
+				<label>Jezik: <input type="text" id="jezik" placeholder="Opcionalno" /></label><br><br>
+				
+				<div id="buttonsWrapper">
+					<button onclick="dodajKnjigu()">Dodaj knjigu</button>
+					<button id="btnOtkaziDodavanje" style="margin-left: 10px;">Otkaži</button>
+				</div>
+			</div>
+		</div>
+		
+		<br><br><br>		
+
+		<div class="header-container">
+			<h2>Lista knjiga</h2>
+			<input type="text" id="searchInput" placeholder="Pretraži knjige..." onkeyup="filterBooks()">
+		</div>
+		
+		<select id="filterSelect">
+			<option value="all">Prikaži sve knjige</option>
+			<option value="Dostupna">Samo dostupne</option>
+			<option value="Zadužena">Samo zadužene</option>
+		</select>
+
+		
+		<table id="listaKnjiga">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Naslov</th>
+					<th>Autor</th>
+					<th>Status</th> 			
+					<th>Žanr</th>
+					<th>Jezik</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		
+		
+		<br><br>
+		
+		<div class="dugmad-container">
+			<a href="index.html" class="btn-nazad">👈 Nazad na početnu</a>
+			<a href="korisnici.html" class="btn-korisnici">Lista korisnika 👉</a>
+		</div>
+		
+
+		<div id="usernameModal" class="modal">
+		  <div class="modal-content">
+			<span class="close">&times;</span>
+			
+			<!--
+			<h2>Unesite korisničko ime</h2>
+			<label for="usernameInput">Korisnik:</label>
+			-->
+			
+			<input list="korisniciList" id="usernameInput" placeholder="Unesite korisničko ime">
+			<datalist id="korisniciList"> </datalist>
+
+			<input type="date" id="datumInput">
+			
+			<button id="confirmBtn">Zaduži</button>
+			<button id="closeBtn">Otkaži</button>			
+		  </div>
+		</div>
+
+
+		<script src="knjige.js"> </script>
+	</body>
+</html>

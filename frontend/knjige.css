@@ -1,0 +1,436 @@
+		#modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.4);
+			backdrop-filter: blur(4px);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			animation: fadeIn 0.3s ease-in-out;
+		}
+
+		#modalContent {
+			background: rgba(255, 255, 255, 0.95);
+			padding: 25px 30px;
+			border-radius: 10px;
+			min-width: 320px;
+			position: relative;
+			box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+			animation: zoomIn 0.3s ease;
+			font-family: Arial, sans-serif;
+		}
+
+		#modalContent input {
+			width: 100%;
+			margin: 5px 0 15px 0;
+			padding: 8px;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			transition: border-color 0.2s;
+		}
+
+		#modalContent input:focus {
+			border-color: #0066cc;
+			outline: none;
+		}
+
+		#modalContent button {
+			padding: 8px 16px;
+			background-color: #0066cc;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+		#modalContent button:hover {
+			background-color: #004c99;
+		}
+
+		#btnOtkaziDodavanje {
+			background-color: #999;
+		}
+
+		#btnOtkaziDodavanje:hover {
+			background-color: #777;
+		}
+
+		#zatvoriModal {
+			font-size: 24px;
+			color: #666;
+			transition: color 0.2s;
+		}
+
+		#zatvoriModal:hover {
+			color: #000;
+			cursor: pointer;
+		}
+		
+		#buttonsWrapper {
+		  display: flex;
+		  gap: 10px;        /* razmak između dugmadi */
+		  margin-top: 10px; /* malo razmaka odozgo */
+		}
+
+		#buttonsWrapper button {
+		  flex: 1;          /* dugmad zauzimaju jednaku širinu */
+		  padding: 10px 0;  /* vertikalni padding */
+		  font-size: 16px;
+		  cursor: pointer;
+		}
+
+
+		/* Animacije */
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes zoomIn {
+			from {
+				transform: scale(0.9);
+				opacity: 0;
+			}
+			to {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+			
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 14px; 
+			}
+
+			th, td {
+				border: 1px solid #ccc;
+				padding: 4px 8px;
+				text-align: left;
+			}
+
+			th {
+				width: 60px;
+				background-color: #f0f0f0;
+				table-layout: fixed;
+				width: 100%; 
+			}
+			
+			td {
+				width: 40px;
+			
+			}
+			
+			
+			
+
+			table#listaKnjiga thead th {
+				background-color: #d0e7ff;
+			}
+
+			
+
+
+
+
+
+
+			button {
+				font-size: 12px;
+				padding: 4px 6px;
+				margin: 2px;
+			}
+
+			/* Opcionalno: smanji širinu ID kolone */
+			td:first-child, th:first-child {
+				width: 50px;
+				text-align: center;
+			}
+
+			/* Opcionalno: skrati širinu za dugmad */
+			td:last-child, th:last-child {
+				width: 120px;
+				text-align: center;
+			}
+			
+			td.akcije {
+			  width: 140px;
+			  white-space: nowrap;
+			  text-align: left;
+			  padding-left: 10px;
+			  display: flex;
+			  flex-direction: column; /* redanje dugmića jedan iznad drugog fercera i bez ovoga,ali ne i u tabeli sa korisnicima */
+			  gap: 5px; /* razmak između dugmadi */
+			  
+			}
+
+			td.akcije button {
+			  opacity: 0;
+			  transition: opacity 0.3s ease;
+			  margin-right: 8px;
+			  padding: 6px 0px;
+			  width: 70px;             
+			  font-size: 11px;
+			  text-align: center;
+			  box-sizing: border-box;
+			}
+
+			/* samo kada korisnik pređe mišem */
+			tr:hover td.akcije button {
+			  opacity: 1;
+			}
+			
+			/* da se ne vide linije od tabele */
+			th.akcije,
+			td.akcije {
+			border: none !important; }
+			
+			.btn-obrisi {
+				background-color: #e74c3c; /* crvena */
+				color: white;
+				border: none;
+				padding: 6px 12px;
+				border-radius: 4px;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+
+			.btn-obrisi:hover {
+				background-color: #c0392b;
+			}
+
+			.btn-izmijeni {
+				background-color: #3498db; /* plava */
+				color: white;
+				border: none;
+				padding: 6px 12px;
+				border-radius: 4px;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+
+			.btn-izmijeni:hover {
+				background-color: #2980b9;
+			}
+			
+			.btn-zaduzi {
+				background-color: #2ecc71; /* zelena */
+				color: white;
+				border: none;
+				padding: 6px 12px;
+				border-radius: 4px;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+
+			.btn-zaduzi:hover {
+				background-color: #27ae60;
+			}
+
+
+			
+			.naslov {
+				font-size: 1.7em;				
+				color: #003366
+			}
+			.autor {
+				font-weight: bold;
+			}
+			
+			.header-container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 10px;
+			}
+
+			#searchInput {
+				padding: 5px 10px;
+				font-size: 14px;
+				width: 200px;
+				margin-right: 160px; 
+			}
+			
+			
+
+			.btn-nazad {
+				display: inline-block;
+				background-color: #bdc3c7; /* siva */
+				color: #2c3e50;
+				padding: 8px 16px;
+				border-radius: 4px;
+				text-decoration: none;
+				font-size: 14px;
+				font-weight: 500;
+				transition: background-color 0.2s ease;
+			}
+			.btn-nazad:hover {
+				background-color: #95a5a6;
+			}
+			
+			.btn-korisnici {
+				display: inline-block;
+				background-color: #bdc3c7; /* siva */
+				color: #2c3e50;
+				padding: 8px 16px;
+				border-radius: 4px;
+				text-decoration: none;
+				font-size: 14px;
+				font-weight: 500;
+				transition: background-color 0.2s ease;
+			}
+			.btn-korisnici:hover {
+				background-color: #95a5a6;
+			}
+			
+			.dugmad-container {
+			  display: flex;
+			  justify-content: space-between;
+			  align-items: center;
+			  padding: 10px;
+			}
+			
+			
+			#usernameModal {
+				display: none; 
+				position: fixed;
+				z-index: 1000;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.4);
+				backdrop-filter: blur(4px);
+				align-items: center;
+				justify-content: center;
+				animation: fadeInCentered 0.3s ease-in-out;
+			}
+
+			#usernameModal .modal-content {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: rgba(255, 255, 255, 0.95);
+				padding: 25px 30px;
+				border-radius: 10px;
+				width: 320px;
+				max-width: 90%;
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+				animation: zoomInCentered 0.3s ease;
+				text-align: center;
+				font-family: Arial, sans-serif;
+			}
+
+			#usernameModal .modal-content .close {
+				position: absolute;
+				top: 10px;
+				right: 15px;
+				font-size: 24px;
+				color: #666;
+				cursor: pointer;
+				transition: color 0.2s;
+			}
+
+			#usernameModal .modal-content .close:hover {
+				color: #000;
+			}
+
+
+			#usernameModal #usernameInput {
+				width: 93%;
+				padding: 10px;
+				margin: 20px 0;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 16px;
+				transition: border-color 0.2s, box-shadow 0.2s;
+			}
+
+			#usernameModal #usernameInput:focus {
+				border-color: #0066cc;
+				outline: none;
+				box-shadow: 0 0 5px rgba(0, 102, 204, 0.4);
+			}
+			
+			
+			#usernameModal #datumInput {
+				width: 100%;
+				padding: 10px;
+				margin: 20px 0;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 16px;
+				transition: border-color 0.2s, box-shadow 0.2s;
+				box-sizing: border-box; /* Da padding i border ne šire ukupnu širinu */
+				font-family: Arial, sans-serif; /* da bude usklađeno sa modalom */
+			}
+
+			#usernameModal #datumInput:focus {
+				border-color: #0066cc;
+				outline: none;
+				box-shadow: 0 0 5px rgba(0, 102, 204, 0.4);
+			}
+
+
+
+			#usernameModal #confirmBtn,
+			#usernameModal #closeBtn {
+				padding: 10px 20px;
+				border: none;
+				border-radius: 5px;
+				margin: 10px 0 0 0;
+				font-size: 15px;
+				cursor: pointer;
+				transition: background-color 0.2s, transform 0.1s;
+				display: block;
+				width: 100%;
+			}
+
+			#usernameModal #confirmBtn {
+				background-color: #0066cc;
+				color: white;
+			}
+
+			#usernameModal #confirmBtn:hover {
+				background-color: #004c99;
+				transform: scale(1.03);
+			}
+
+			#usernameModal #closeBtn {
+				background-color: #999;
+				color: white;
+			}
+
+			#usernameModal #closeBtn:hover {
+				background-color: #777;
+				transform: scale(1.03);
+			}
+
+
+			@keyframes fadeInCentered {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes zoomInCentered {
+				from {
+					transform: translate(-50%, -50%) scale(0.9);
+					opacity: 0;
+				}
+				to {
+					transform: translate(-50%, -50%) scale(1);
+					opacity: 1;
+				}
+			}

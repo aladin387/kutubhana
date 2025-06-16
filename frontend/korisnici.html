@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="korisnici.css">
+		<title>Lista korisnika</title>
+</head>
+
+<body>
+
+		<h1>Kutubhana MullaSadra</h1>
+		<button id="btnPrikaziFormu">DODAJ KORISNIKA</button>
+
+		<div id="modal" style="display: none;">
+			<div id="modalContent">
+				<span id="zatvoriModal" style="float: right; cursor: pointer;">&times;</span>
+				<h3>Dodaj novog korisnika</h3>
+				<label>Ime i prezime: <input type="text" id="username" placeholder="Obavezno polje" /></label><br>
+				
+				<div id="buttonsWrapper">
+					<button onclick="dodajKorisnika()">Dodaj korisnika</button>
+					<button id="btnOtkaziDodavanje" style="margin-left: 10px;">Otkaži</button>
+				</div>
+			</div>
+		</div>
+
+		<br><br><br>
+		
+		<div class="header-container">
+			<h2>Lista korisnika</h2>
+			<input type="text" id="searchInput" placeholder="Pretraži korisnike..." onkeyup="filterUsers()">
+		</div>
+	
+		<table id="listaKorisnika">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Ime i prezime</th>
+				</tr>
+			</thead>
+			  <tbody>  </tbody>
+		</table>
+
+		<br><br>
+		
+		<div class="dugmad-container">
+			<a href="index.html" class="btn-nazad">👈 Nazad na početnu</a>
+			<a href="knjige.html" class="btn-knjige">Lista knjiga 👉</a>
+		</div>
+		
+		
+		<div id="userModal" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<h2 id="modalTitle">Podaci o korisniku</h2>
+				<p id="modalInfo"></p>
+			</div>
+		</div>
+
+</body>
+
+<script src="korisnici.js"></script>
