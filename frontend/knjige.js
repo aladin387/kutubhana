@@ -18,24 +18,59 @@
 								: `<button class="btn-zaduzi" onclick="zaduziKnjigu(${knjiga.id})">Zaduži</button>`;
 
 
-							row.innerHTML = `
-								<td>${knjiga.id}</td>
-								<td class="naslov">${knjiga.naslov}</td>
-								<td class="autor">${knjiga.autor}</td>
-								<td class="status">${status}</td>								
-								<td class="zanr">${knjiga.zanr}</td>
-								<td class="jezik">${knjiga.jezik}</td>
-								<td class="akcije">
-									<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>
-									<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${knjiga.id})">Izmijeni</button>
-									${dugmeAkcija}
-								</td>
-							`;
+						row.innerHTML = `
+							<td class="id-klasa" style="cursor: pointer;">${knjiga.id}</td>
+							<td class="naslov-klasa" style="cursor: pointer;">${knjiga.naslov}</td>
+							<td class="autor">${knjiga.autor}</td>
+							<td class="status">${status}</td>								
+							<td class="zanr">${knjiga.zanr}</td>
+							<td class="jezik">${knjiga.jezik}</td>
+							<td class="akcije">
+								<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>
+								<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${knjiga.id})">Izmijeni</button>
+								${dugmeAkcija}
+							</td>
+						`;
+						
+						row.querySelector(".id-klasa").addEventListener("click", () => prikaziDetaljeKnjige(knjiga));
+						row.querySelector(".naslov-klasa").addEventListener("click", () => prikaziDetaljeKnjige(knjiga));
+						
+						row.querySelector(".autor").addEventListener("click", () => prikaziAutora(knjiga.autor));
+
+
 
 							tbody.appendChild(row);
+							
+
+
 						});
 					});
 			}
+			
+			
+			function prikaziAutora(imeAutora) {
+				const prozor = document.getElementById("autorProzor");
+				const detalji = document.getElementById("autorDetalji");
+				const zatvori = prozor.querySelector(".custom-close");
+
+				detalji.textContent = `Autor: ${imeAutora}`;
+				prozor.style.display = "flex";
+
+				zatvori.onclick = () => prozor.style.display = "none";
+
+				window.addEventListener("click", function (event) {
+					if (event.target === prozor) {
+						prozor.style.display = "none";
+					}
+				});
+
+				document.addEventListener("keydown", function (event) {
+					if (event.key === "Escape") {
+						prozor.style.display = "none";
+					}
+				});
+			}
+
 			
 
 			
@@ -358,23 +393,24 @@
 				  };
 			}
 			
+			//ne znam šta radi ova metoda
 			function ucitajKorisnike() {
-  fetch("http://localhost:8080/api/korisnici") // prilagodi URL ako treba
-    .then(response => response.json())
-    .then(korisnici => {
-      const datalist = document.getElementById("korisniciList");
-      datalist.innerHTML = ""; // očisti stari sadržaj
+					  fetch("http://localhost:8080/api/korisnici")
+						.then(response => response.json())
+						.then(korisnici => {
+						  const datalist = document.getElementById("korisniciList");
+						  datalist.innerHTML = ""; // očisti stari sadržaj
 
-      korisnici.forEach(k => {
-        const option = document.createElement("option");
-        option.value = k.username;
-        datalist.appendChild(option);
-      });
+						  korisnici.forEach(k => {
+							const option = document.createElement("option");
+							option.value = k.username;
+							datalist.appendChild(option);
+						  });
 
-      // Sačuvaj sve usernameove za provjeru u JS-u
-      window.validUsernames = korisnici.map(k => k.username);
-    });
-}
+						  // Sačuvaj sve usernameove za provjeru u JS-u
+						  window.validUsernames = korisnici.map(k => k.username);
+						});
+					}
 
 		
 
@@ -385,5 +421,77 @@
 				.then(() => ucitajKnjige())
 				.catch(err => console.error("Greška pri razduživanju:", err));
 			}
+	
+
+
+			
+			function prikaziDetaljeKnjige(knjiga) {
+				const modal = document.getElementById("detaljiModal");
+
+				document.getElementById("detaljiId").textContent = knjiga.id;
+				document.getElementById("detaljiNaslov").textContent = knjiga.naslov;
+				document.getElementById("detaljiAutor").textContent = knjiga.autor;
+				document.getElementById("detaljiStatus").textContent = knjiga.status || "N/A";
+				document.getElementById("detaljiZanr").textContent = knjiga.zanr;
+				document.getElementById("detaljiJezik").textContent = knjiga.jezik;
+				
+				document.getElementById("detaljiKorisnik").textContent = knjiga.korisnik || "—";
+				document.getElementById("detaljiDatum").textContent = knjiga.datumZaduzenja || "—";
+
+				modal.style.display = "flex"; // ili "block", zavisi od CSS-a
+
+				// Escape za zatvaranje
+				function escListener(e) {
+					if (e.key === "Escape") {
+						modal.style.display = "none";
+						document.removeEventListener("keydown", escListener);
+					}
+				}
+				document.addEventListener("keydown", escListener);
+			}
+
+			
+
+			document.querySelector(".closeDetalji").addEventListener("click", () => {
+				document.getElementById("detaljiModal").style.display = "none";
+			});
+
+			window.addEventListener("click", (event) => {
+				const modal = document.getElementById("detaljiModal");
+				if (event.target === modal) {
+					modal.style.display = "none";
+				}
+				
+				
+			});
+			
+
+			function otvoriTab(evt, tabId) {
+			  const tabovi = document.querySelectorAll(".tab-sadrzaj");
+			  const dugmad = document.querySelectorAll(".tabovi .tab");
+
+			  tabovi.forEach(tab => tab.classList.remove("active"));
+			  dugmad.forEach(tab => tab.classList.remove("active"));
+
+			  document.getElementById(tabId).classList.add("active");
+			  evt.currentTarget.classList.add("active");
+			}
+			
+			
+			document.querySelector(".closeDetalji").addEventListener("click", () => {
+				document.getElementById("detaljiModal").style.display = "none";
+			});
+			
+			window.addEventListener("click", function (event) {
+				const modal = document.getElementById("detaljiModal");
+				if (event.target === modal) {
+					modal.style.display = "none";
+				}
+			});
+
+
+
+
+			
 
 			ucitajKnjige();

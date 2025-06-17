@@ -92,6 +92,46 @@
 			<button id="closeBtn">Otkaži</button>			
 		  </div>
 		</div>
+		
+		
+		<!-- Modal za prikaz detalja knjige -->
+		<div id="detaljiModal" class="detalji-prozor-overlay">
+		  <div class="detalji-prozor">
+			<span class="closeDetalji">&times;</span>
+			<h3>Detalji o knjizi</h3>
+
+			<ul class="tabovi">
+			  <li class="tab active" onclick="otvoriTab(event, 'osnovni')">📖 Osnovni podaci</li>
+			  <li class="tab" onclick="otvoriTab(event, 'zaduzenje')">👤 Zaduženje</li>
+			</ul>
+
+			<div id="osnovni" class="tab-sadrzaj active">
+			  <p><strong>ID:</strong> <span id="detaljiId"></span></p>
+			  <p><strong>Naslov:</strong> <span id="detaljiNaslov"></span></p>
+			  <p><strong>Autor:</strong> <span id="detaljiAutor"></span></p>
+			  <p><strong>Žanr:</strong> <span id="detaljiZanr"></span></p>
+			  <p><strong>Jezik:</strong> <span id="detaljiJezik"></span></p>
+			</div>
+
+			<div id="zaduzenje" class="tab-sadrzaj">
+			  <p><strong>Status:</strong> <span id="detaljiStatus"></span></p>
+			  <p><strong>Korisnik:</strong> <span id="detaljiKorisnik"></span></p>
+			  <p><strong>Datum zaduženja:</strong> <span id="detaljiDatum"></span></p>
+			</div>
+		  </div>
+		</div>
+		
+		
+
+		<!-- Modal za prikaz detalja autora -->
+		<div id="autorProzor" class="custom-popup">
+		  <div class="custom-popup-content">
+			<span class="custom-close">&times;</span>
+			<h3>Informacije o autoru</h3>
+			<p id="autorDetalji"></p>
+		  </div>
+		</div>
+
 
 
 		<script src="knjige.js"> </script>

@@ -151,7 +151,6 @@
 			}					
 			
 			
-						// Selektujemo dugmad i modal
 			const btnPrikaziFormu = document.getElementById("btnPrikaziFormu");
 			const modal = document.getElementById("modal");
 			const zatvoriModal = document.getElementById("zatvoriModal");
@@ -162,7 +161,7 @@
 				modal.style.display = "flex";
 				document.getElementById("username").focus();
 
-			}
+			} 
 
 			// Funkcija za zatvaranje modala
 			function zatvoriFormu() {
@@ -189,15 +188,18 @@
 			  }
 			});
 
-			
-			document.addEventListener("DOMContentLoaded", async () => {
-				const modal = document.getElementById("userModal");
-				modal.style.display = "none";
 
-				await ucitajKorisnike(); // čekamo da se tabela popuni
-				
-				
-				
+
+
+			document.addEventListener("DOMContentLoaded", async () => {
+				// Sakrij modal za korisnika na početku
+				const korisnikProzor = document.getElementById("korisnikProzor");
+				korisnikProzor.style.display = "none";
+
+				// Učitaj korisnike i popuni tabelu
+				await ucitajKorisnike();
+
+				// Dohvati aktivne zadužene korisnike s API-ja
 				fetch("http://localhost:8080/api/zaduzenja/aktivni-korisnici")
 					.then(response => response.json())
 					.then(data => {
@@ -210,6 +212,7 @@
 
 							const isZaduzen = zaduzeniKorisnici.some(korisnik => korisnik.id == userId);
 
+							// Dodaj klasu i tooltip ako je korisnik zadužen
 							if (isZaduzen) {
 								usernameCell.classList.add("korisnik-zaduzen");
 								usernameCell.title = "📚 Ima zaduženu knjigu";
@@ -220,32 +223,41 @@
 
 							usernameCell.style.cursor = "pointer";
 
+							// Event listener za otvaranje korisničkog modala
 							usernameCell.addEventListener("click", () => {
-								document.getElementById("modalTitle").textContent = `Korisnik: ${usernameCell.textContent}`;
-								document.getElementById("modalInfo").textContent = isZaduzen
+								const info = document.getElementById("korisnikInfo");
+								const naslov = document.getElementById("korisnikNaslov");
+
+								naslov.textContent = `Korisnik: ${usernameCell.textContent}`;
+								info.innerHTML = isZaduzen
 									? "📚 Trenutno ima zaduženu knjigu!"
 									: "✔ Nema aktivnih zaduženja.";
 
-								setTimeout(() => {
-									modal.style.display = "block";
-								}, 50);
+								// Pokaži modal sa efektom fade (pretpostavka da si u CSS-u podesio display:flex)
+								korisnikProzor.style.display = "flex";
+
+								// ESC za zatvaranje i uklanjanje event listenera da ne bi gomilali
+								function escListener(e) {
+									if (e.key === "Escape") {
+										korisnikProzor.style.display = "none";
+										document.removeEventListener("keydown", escListener);
+									}
+								}
+								document.addEventListener("keydown", escListener);
 							});
 						});
 					})
 					.catch(error => console.error("Greška pri dohvaćanju aktivnih korisnika:", error));
 
-				
-				
-				
-				// Modal zatvaranje
-				document.querySelector(".close").addEventListener("click", () => {
-					modal.style.display = "none";
+				// Klik na X dugme za zatvaranje korisničkog modala
+				document.querySelector(".zatvori-korisnik").addEventListener("click", () => {
+					korisnikProzor.style.display = "none";
 				});
 
-				window.addEventListener("keydown", (event) => {
-					if (event.key === "Escape") {
-						document.getElementById("userModal").style.display = "none";
+				// Klik izvan modala zatvara modal (pretpostavka da overlay ima id korisnikProzor)
+				window.addEventListener("click", (event) => {
+					if (event.target === korisnikProzor) {
+						korisnikProzor.style.display = "none";
 					}
 				});
-
 			});
