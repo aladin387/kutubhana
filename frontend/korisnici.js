@@ -1,5 +1,8 @@
 
 			const API_URL = "http://localhost:8080/api/korisnici";
+			
+			let editKorisnikModUkljucen = false; // globalna varijabla da bi se u funkcijama za prikaz modula/prozora,  onemogućilo njihovo pojavljivanje dok traje editovanje
+
 
 			function ucitajKorisnike() {
 				return fetch(API_URL)
@@ -19,6 +22,7 @@
 									<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${korisnik.id})">Izmijeni</button>
 								</td>
 							`;
+							
 
 							tbody.appendChild(row);
 						});
@@ -80,6 +84,7 @@
 
 				if (!jeURezimIzmjene) {
 
+					editKorisnikModUkljucen = true;
 					const username = tr.querySelector(".username").textContent;
 
 					tr.querySelector(".username").innerHTML = `<input type="text" value="${username}" data-original="${username}">`;
@@ -98,6 +103,8 @@
 								tr.querySelector(".username").textContent = username;
 								
 								btn.textContent = "Izmijeni";
+								editKorisnikModUkljucen = false;
+
 							}
 						});
 					});
@@ -120,10 +127,13 @@
 
 						btn.textContent = "Izmijeni";
 						alert("Korisnik je uspješno izmijenjen.");
+						editKorisnikModUkljucen = false;
+
 					})
 					.catch(err => {
 						console.error(err);
 						alert("Ime i prezime su obavezni.");
+						editKorisnikModUkljucen = false;
 					});
 				}
 			}
@@ -148,7 +158,15 @@
 
 					rows[i].style.display = matchFound ? "" : "none";
 				}
-			}					
+			}
+
+			document.getElementById("searchInput").addEventListener("keydown", function (event) {
+				if (event.key === "Escape") {
+					this.blur();
+					this.value = "";
+					filterBooks();
+				}
+			});			
 			
 			
 			const btnPrikaziFormu = document.getElementById("btnPrikaziFormu");
@@ -225,6 +243,9 @@
 
 							// Event listener za otvaranje korisničkog modala
 							usernameCell.addEventListener("click", () => {
+								
+								if (editKorisnikModUkljucen) return;
+								
 								const info = document.getElementById("korisnikInfo");
 								const naslov = document.getElementById("korisnikNaslov");
 
@@ -233,10 +254,8 @@
 									? "📚 Trenutno ima zaduženu knjigu!"
 									: "✔ Nema aktivnih zaduženja.";
 
-								// Pokaži modal sa efektom fade (pretpostavka da si u CSS-u podesio display:flex)
 								korisnikProzor.style.display = "flex";
 
-								// ESC za zatvaranje i uklanjanje event listenera da ne bi gomilali
 								function escListener(e) {
 									if (e.key === "Escape") {
 										korisnikProzor.style.display = "none";
@@ -261,3 +280,16 @@
 					}
 				});
 			});
+			
+			
+			window.addEventListener("keydown", function(event) {
+				if (
+					event.key === "Backspace" &&
+					document.activeElement.tagName !== "INPUT" &&
+					document.activeElement.tagName !== "TEXTAREA"
+				) {
+					event.preventDefault();
+					window.location.href = "index.html";
+				}
+			});
+

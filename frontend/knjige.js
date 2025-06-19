@@ -1,5 +1,8 @@
 
 			const API_URL = "http://localhost:8080/api/knjige";
+			
+			let editModUkljucen = false; // globalna varijabla da bi se u funkcijama za prikaz modula/prozora,  onemogućilo njihovo pojavljivanje dok traje editovanje
+
 
 			function ucitajKnjige() {
 				fetch(API_URL)
@@ -20,7 +23,7 @@
 
 						row.innerHTML = `
 							<td class="id-klasa" style="cursor: pointer;">${knjiga.id}</td>
-							<td class="naslov-klasa" style="cursor: pointer;">${knjiga.naslov}</td>
+							<td class="naslov" style="cursor: pointer;">${knjiga.naslov}</td>
 							<td class="autor">${knjiga.autor}</td>
 							<td class="status">${status}</td>								
 							<td class="zanr">${knjiga.zanr}</td>
@@ -32,10 +35,20 @@
 							</td>
 						`;
 						
-						row.querySelector(".id-klasa").addEventListener("click", () => prikaziDetaljeKnjige(knjiga));
-						row.querySelector(".naslov-klasa").addEventListener("click", () => prikaziDetaljeKnjige(knjiga));
-						
-						row.querySelector(".autor").addEventListener("click", () => prikaziAutora(knjiga.autor));
+row.querySelector(".id-klasa").addEventListener("click", () => {
+	if (editModUkljucen) return;
+	prikaziDetaljeKnjige(knjiga); //ovo bih možda trebao ukloniti?
+});
+
+row.querySelector(".naslov").addEventListener("click", () => {
+	if (editModUkljucen) return;
+	prikaziDetaljeKnjige(knjiga);
+});
+
+row.querySelector(".autor").addEventListener("click", () => {
+	if (editModUkljucen) return;
+	prikaziAutora(knjiga.autor);
+});
 
 
 
@@ -95,6 +108,13 @@
 				}
 			}
 			
+			document.getElementById("searchInput").addEventListener("keydown", function (event) {
+				if (event.key === "Escape") {
+					this.blur();
+					this.value = "";
+					filterBooks();
+				}
+			});
 			
 
 			
@@ -247,6 +267,7 @@
 				const jeURezimIzmjene = btn.textContent === "Sačuvaj";
 
 				if (!jeURezimIzmjene) {
+					editModUkljucen = true;
 					const naslov = tr.querySelector(".naslov").textContent;
 					const autor = tr.querySelector(".autor").textContent;
 					const zanr = tr.querySelector(".zanr").textContent;
@@ -274,6 +295,7 @@
 								tr.querySelector(".jezik").textContent = jezik;
 
 								btn.textContent = "Izmijeni";
+								editModUkljucen = false;
 							}
 						});
 					});
@@ -303,6 +325,7 @@
 
 						btn.textContent = "Izmijeni";
 						alert("Knjiga je uspješno izmijenjena.");
+						editModUkljucen = false;
 					})
 					.catch(err => {
 						console.error(err);
@@ -482,12 +505,18 @@
 				document.getElementById("detaljiModal").style.display = "none";
 			});
 			
-			window.addEventListener("click", function (event) {
-				const modal = document.getElementById("detaljiModal");
-				if (event.target === modal) {
-					modal.style.display = "none";
+			
+			window.addEventListener("keydown", function(event) {
+				if (
+					event.key === "Backspace" &&
+					document.activeElement.tagName !== "INPUT" &&
+					document.activeElement.tagName !== "TEXTAREA"
+				) {
+					event.preventDefault();
+					window.location.href = "index.html";
 				}
 			});
+
 
 
 
