@@ -146,6 +146,13 @@
 
 				for (let i = 1; i < rows.length; i++) { // i = 1, da preskoči header
 					const cells = rows[i].getElementsByTagName("td");
+					
+					if (input === "") {
+						// prikazuje sve kada se klikne na Escape
+						rows[i].style.display = "";
+						continue;
+					}
+					
 					let matchFound = false;
 
 					for (let j = 0; j < cells.length; j++) {
@@ -164,7 +171,7 @@
 				if (event.key === "Escape") {
 					this.blur();
 					this.value = "";
-					filterBooks();
+					filterUsers();
 				}
 			});			
 			
