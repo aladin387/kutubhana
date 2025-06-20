@@ -117,25 +117,54 @@
 				text-align: left;
 			}
 
-			th {
-				width: 60px;
-				background-color: #f0f0f0;
-				table-layout: fixed;
-				width: 100%; 
-			}
 			
-			td {
-				width: 40px;
-			
-			}
-			
-			
-			
-
 			table#listaKnjiga thead th {
 				background-color: #d0e7ff;
 			}
+			
+			
+			table#listaKnjiga th:nth-child(1), /* ID */
+			table#listaKnjiga td:nth-child(1) {
+				width: 5%;
+			}
 
+			table#listaKnjiga th:nth-child(2), /* Naslov */
+			table#listaKnjiga td:nth-child(2) {
+				width: 30%;
+			}
+
+			table#listaKnjiga th:nth-child(3), /* Autor */
+			table#listaKnjiga td:nth-child(3) {
+				width: 25%;
+			}
+
+			table#listaKnjiga th:nth-child(4), /* Status */
+			table#listaKnjiga td:nth-child(4) {
+				width: 10%px;
+			}
+
+			table#listaKnjiga th:nth-child(5), /* Žanr */
+			table#listaKnjiga td:nth-child(5) {
+				width: 10%;
+			}
+
+			table#listaKnjiga th:nth-child(6), /* Žanr */
+			table#listaKnjiga td:nth-child(6) {
+				width: 10%;
+			}
+
+
+			table#listaKnjiga th:nth-child(7), 
+			table#listaKnjiga td:nth-child(7) {
+				width: 10%;
+				text-align: center;
+			}
+
+
+			table td input {
+				width: 100%;
+				box-sizing: border-box;
+			}
 			
 
 
@@ -284,7 +313,7 @@
 				padding: 5px 10px;
 				font-size: 14px;
 				width: 200px;
-				margin-right: 160px; 
+				margin-right: 210px; 
 			}
 			
 			
@@ -292,52 +321,52 @@
 			
 			
 						
-/* dugmad sa linkovima za početnu i za stranicu sa listom korisnika */
-.nav-links {
-	display: flex;
-	gap: 20px;
-	margin-top: 40px;
-}
+			/* dugmad sa linkovima za početnu i za stranicu sa listom korisnika */
+			.nav-links {
+				display: flex;
+				gap: 20px;
+				margin-top: 40px;
+			}
 
-.razmaknuti-links {
-	justify-content: space-between;
-	width: 100%;
-}
+			.razmaknuti-links {
+				justify-content: space-between;
+				width: 100%;
+			}
 
-.nav-links a {
-	font-family: 'Arial', sans-serif;
-	display: inline-block;
-	padding: 14px 36px;
-	font-size: 16px;
-	text-decoration: none;
-	color: #fff;
-	background: linear-gradient(135deg, #3498db, #2980b9);
-	border-radius: 13px;
-	box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-	transition: transform 0.3s ease, box-shadow 0.3s ease;
-	font-weight: 600;
-}
+			.nav-links a {
+				font-family: 'Arial', sans-serif;
+				display: inline-block;
+				padding: 14px 36px;
+				font-size: 16px;
+				text-decoration: none;
+				color: #fff;
+				background: linear-gradient(135deg, #3498db, #2980b9);
+				border-radius: 13px;
+				box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+				font-weight: 600;
+			}
 
-.nav-links a:hover {
-	transform: translateY(-4px);
-	box-shadow: 0 8px 15px rgba(41, 128, 185, 0.5);
-	background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-	color: #222;
-}
+			.nav-links a:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 8px 15px rgba(41, 128, 185, 0.5);
+				background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+				color: #222;
+			}
 
-@media (max-width: 600px) {
-	.razmaknuti-links {
-		flex-direction: column;
-		align-items: center;
-	}
+			@media (max-width: 600px) {
+				.razmaknuti-links {
+					flex-direction: column;
+					align-items: center;
+				}
 
-	.nav-links a {
-		width: 80%;
-		text-align: center;
-		margin-bottom: 10px;
-	}
-}
-		
+				.nav-links a {
+					width: 80%;
+					text-align: center;
+					margin-bottom: 10px;
+				}
+			}
+					
 
 			
 			

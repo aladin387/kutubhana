@@ -17,6 +17,9 @@
 							row.innerHTML = `
 								<td>${korisnik.id}</td>
 								<td class="username">${korisnik.username}</td>
+								<td class="email">${korisnik.email}</td>
+								<td class="phone">${korisnik.phone}</td>
+								<td class="address">${korisnik.address}</td>
 								<td class="akcije">
 									<button class="btn-obrisi" onclick="obrisiKorisnika(${korisnik.id})">Obriši</button>
 									<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${korisnik.id})">Izmijeni</button>
@@ -32,6 +35,9 @@
 
 			function dodajKorisnika() {
 				const username = document.getElementById("username").value.trim();
+				const email = document.getElementById("email").value.trim();
+				const phone = document.getElementById("phone").value.trim();
+				const address = document.getElementById("address").value.trim();
 
 				if (!username) {
 					alert("Ime korisnika je obavezno");
@@ -39,7 +45,7 @@
 					return;
 				}
 
-				const korisnik = { username };
+				const korisnik = { username, email, phone, address };
 
 
 				fetch(API_URL, {
@@ -50,6 +56,9 @@
 				.then(() => {
 					ucitajKorisnike();
 					document.getElementById("username").value = "";
+					document.getElementById("email").value = "";
+					document.getElementById("phone").value = "";
+					document.getElementById("address").value = "";
 					document.getElementById("btnPrikaziFormu").textContent = "DODAJ KORISNIKA";
 				});
 				
@@ -57,7 +66,7 @@
 			}
 			
 			//da se dodaje sa enterom
-			["username"].forEach(id => {
+			["username", "email", "phone", "address"].forEach(id => {
 				document.getElementById(id).addEventListener("keydown", function (event) {
 					if (event.key === "Enter") {
 						event.preventDefault();
@@ -83,11 +92,23 @@
 				const jeURezimIzmjene = btn.textContent === "Sačuvaj";
 
 				if (!jeURezimIzmjene) {
+					
+							if (editKorisnikModUkljucen) {
+								alert("Već uređujete jednog korisnika. Sačuvajte ili otkažite izmjene prije nastavka.");
+								return;
+							}
 
 					editKorisnikModUkljucen = true;
+					
 					const username = tr.querySelector(".username").textContent;
-
+					const email = tr.querySelector(".email").textContent;
+					const phone = tr.querySelector(".phone").textContent;
+					const address = tr.querySelector(".address").textContent;
+					
 					tr.querySelector(".username").innerHTML = `<input type="text" value="${username}" data-original="${username}">`;
+					tr.querySelector(".email").innerHTML = `<input type="text" value="${email}" data-original="${email}">`;
+					tr.querySelector(".phone").innerHTML = `<input type="text" value="${phone}" data-original="${phone}">`;
+					tr.querySelector(".address").innerHTML = `<input type="text" value="${address}" data-original="${address}">`;
 
 					btn.textContent = "Sačuvaj";
 					tr.querySelector(".username input").focus();
@@ -101,6 +122,9 @@
 								event.preventDefault();
 
 								tr.querySelector(".username").textContent = username;
+								tr.querySelector(".email").textContent = email;
+								tr.querySelector(".phone").textContent = phone;
+								tr.querySelector(".address").textContent = address;
 								
 								btn.textContent = "Izmijeni";
 								editKorisnikModUkljucen = false;
@@ -111,6 +135,9 @@
 				} else {
 					const noviKorisnik = {
 						username: tr.querySelector(".username input").value.trim(),
+						email: tr.querySelector(".email input").value.trim(),
+						phone: tr.querySelector(".phone input").value.trim(),
+						address: tr.querySelector(".address input").value.trim()
 					};
 
 					fetch(`${API_URL}/${id}`, {
@@ -124,6 +151,9 @@
 					})
 					.then(data => {
 						tr.querySelector(".username").textContent = data.username;
+						tr.querySelector(".email").textContent = data.email;
+						tr.querySelector(".phone").textContent = data.phone;
+						tr.querySelector(".address").textContent = data.address;
 
 						btn.textContent = "Izmijeni";
 						alert("Korisnik je uspješno izmijenjen.");

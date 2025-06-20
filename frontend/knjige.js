@@ -35,20 +35,20 @@
 							</td>
 						`;
 						
-row.querySelector(".id-klasa").addEventListener("click", () => {
-	if (editModUkljucen) return;
-	prikaziDetaljeKnjige(knjiga); //ovo bih možda trebao ukloniti?
-});
+						row.querySelector(".id-klasa").addEventListener("click", () => {
+							if (editModUkljucen) return;
+							prikaziDetaljeKnjige(knjiga); //ovo bih možda trebao ukloniti?
+						});
 
-row.querySelector(".naslov").addEventListener("click", () => {
-	if (editModUkljucen) return;
-	prikaziDetaljeKnjige(knjiga);
-});
+						row.querySelector(".naslov").addEventListener("click", () => {
+							if (editModUkljucen) return;
+							prikaziDetaljeKnjige(knjiga);
+						});
 
-row.querySelector(".autor").addEventListener("click", () => {
-	if (editModUkljucen) return;
-	prikaziAutora(knjiga.autor);
-});
+						row.querySelector(".autor").addEventListener("click", () => {
+							if (editModUkljucen) return;
+							prikaziAutora(knjiga.autor);
+						});
 
 
 
@@ -275,7 +275,15 @@ row.querySelector(".autor").addEventListener("click", () => {
 				const jeURezimIzmjene = btn.textContent === "Sačuvaj";
 
 				if (!jeURezimIzmjene) {
+					
+					if (editModUkljucen) {
+						alert("Već uređujete jednog korisnika. Sačuvajte ili otkažite izmjene prije nastavka.");
+						return;
+					}
+
+					
 					editModUkljucen = true;
+					
 					const naslov = tr.querySelector(".naslov").textContent;
 					const autor = tr.querySelector(".autor").textContent;
 					const zanr = tr.querySelector(".zanr").textContent;

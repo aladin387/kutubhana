@@ -16,6 +16,10 @@ public class Korisnici {
     @NotBlank(message = "Autor je obavezan")
     private String username;
 
+    private String email;
+    private String phone;
+    private String address;
+
 
     @OneToMany(mappedBy = "korisnici", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "korisnik-zaduzenje")
@@ -46,5 +50,29 @@ public class Korisnici {
 
     public void setZaduzenja(List<Zaduzenje> zaduzenja) {
         this.zaduzenja = zaduzenja;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String adress) {
+        this.address = adress;
     }
 }

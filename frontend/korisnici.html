@@ -15,8 +15,11 @@
 			<div id="modalContent">
 				<span id="zatvoriModal" style="float: right; cursor: pointer;">&times;</span>
 				<h3>Dodaj novog korisnika</h3>
-				<label>Ime i prezime: <input type="text" id="username" placeholder="Obavezno polje" /></label><br>
-				
+				<label>Ime i prezime: <input type="text" id="username" placeholder="Obavezno polje" /></label>
+				<label>E - Mail: <input type="text" id="email" placeholder="Opcionalno" /></label>				
+				<label>Telefon: <input type="text" id="phone" placeholder="Opcionalno" /></label>				
+				<label>Adresa: <input type="text" id="address" placeholder="Opcionalno" /></label>
+				<br>
 				<div id="buttonsWrapper">
 					<button onclick="dodajKorisnika()">Dodaj korisnika</button>
 					<button id="btnOtkaziDodavanje" style="margin-left: 10px;">Otkaži</button>
@@ -36,6 +39,9 @@
 				<tr>
 					<th>ID</th>
 					<th>Ime i prezime</th>
+					<th>E - Mail</th>
+					<th>Telefon</th>
+					<th>Adresa</th>
 				</tr>
 			</thead>
 			  <tbody>  </tbody>

@@ -36,6 +36,10 @@ public class KorisniciController {
                 .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
 
         korisnici.setUsername(korisniciDetalji.getUsername());
+        korisnici.setEmail(korisniciDetalji.getEmail());
+        korisnici.setPhone(korisniciDetalji.getPhone());
+        korisnici.setAddress(korisniciDetalji.getAddress());
+
         Korisnici azuriran = korisniciRepo.save(korisnici);
         return ResponseEntity.ok(azuriran);
     }
