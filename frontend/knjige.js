@@ -24,15 +24,19 @@
 						row.innerHTML = `
 							<td class="id-klasa" style="cursor: pointer;">${knjiga.id}</td>
 							<td class="naslov" style="cursor: pointer;">${knjiga.naslov}</td>
-							<td class="autor">${knjiga.autor}</td>
+							<td class="autor" style="cursor: pointer;">${knjiga.autor}</td>
 							<td class="status">${status}</td>								
 							<td class="zanr">${knjiga.zanr}</td>
 							<td class="jezik">${knjiga.jezik}</td>
+
 							<td class="akcije">
-								<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>
+								${status.startsWith("Zadužena")
+									? `<button class="btn-obrisi disabled-brisanje" onclick="alert('Knjiga je zadužena i ne može se obrisati.')">Obriši</button>`
+									: `<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>`}
 								<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${knjiga.id})">Izmijeni</button>
 								${dugmeAkcija}
 							</td>
+
 						`;
 						
 						row.querySelector(".id-klasa").addEventListener("click", () => {
@@ -50,39 +54,14 @@
 							prikaziAutora(knjiga.autor);
 						});
 
-
-
 							tbody.appendChild(row);
-							
-
-
+			
 						});
 					});
 			}
 			
 			
-			function prikaziAutora(imeAutora) {
-				const prozor = document.getElementById("autorProzor");
-				const detalji = document.getElementById("autorDetalji");
-				const zatvori = prozor.querySelector(".custom-close");
 
-				detalji.textContent = `Autor: ${imeAutora}`;
-				prozor.style.display = "flex";
-
-				zatvori.onclick = () => prozor.style.display = "none";
-
-				window.addEventListener("click", function (event) {
-					if (event.target === prozor) {
-						prozor.style.display = "none";
-					}
-				});
-
-				document.addEventListener("keydown", function (event) {
-					if (event.key === "Escape") {
-						prozor.style.display = "none";
-					}
-				});
-			}
 
 			
 
@@ -123,9 +102,7 @@
 					filterBooks();
 				}
 			});
-			
-
-			
+						
 			document.getElementById("filterSelect").addEventListener("change", function () {
 				const selectedStatus = this.value;
 				
@@ -147,7 +124,54 @@
 						row.style.display = "none"; 
 					}
 				});
+			}	
+						
+
+			let currentSortColumn = -1;
+			let currentSortDirection = 1; // 1 = rastuće, -1 = opadajuće
+
+			document.addEventListener("DOMContentLoaded", function () {
+			  const table = document.getElementById("listaKnjiga");
+			  const headers = table.querySelectorAll("th");
+
+			  headers.forEach((header, index) => {
+				header.style.cursor = "pointer";
+				header.addEventListener("click", () => sortTableByColumn(index));
+			  });
+			});
+
+			function sortTableByColumn(columnIndex) {
+			  const table = document.getElementById("listaKnjiga");
+			  const tbody = table.tBodies[0];
+			  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+			  // Promena smera ako kliknemo na istu kolonu
+			  if (columnIndex === currentSortColumn) {
+				currentSortDirection *= -1;
+			  } else {
+				currentSortDirection = 1;
+				currentSortColumn = columnIndex;
+			  }
+
+			  rows.sort((a, b) => {
+				let cellA = a.cells[columnIndex].textContent.trim().toLowerCase();
+				let cellB = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+				// Ako je broj, upoređuj kao broj
+				const isNumeric = !isNaN(cellA) && !isNaN(cellB);
+				if (isNumeric) {
+				  return currentSortDirection * (parseFloat(cellA) - parseFloat(cellB));
+				}
+
+				return currentSortDirection * cellA.localeCompare(cellB);
+			  });
+
+			  // Očisti i ponovo dodaj sortirane redove
+			  tbody.innerHTML = "";
+			  rows.forEach(row => tbody.appendChild(row));
 			}
+
+
 
 
 
@@ -464,6 +488,29 @@
 
 
 			
+			function prikaziAutora(imeAutora) {
+				const prozor = document.getElementById("autorProzor");
+				const detalji = document.getElementById("autorDetalji");
+				const zatvori = prozor.querySelector(".custom-close");
+
+				detalji.textContent = `Autor: ${imeAutora}`;
+				prozor.style.display = "flex";
+
+				zatvori.onclick = () => prozor.style.display = "none";
+
+				window.addEventListener("click", function (event) {
+					if (event.target === prozor) {
+						prozor.style.display = "none";
+					}
+				});
+
+				document.addEventListener("keydown", function (event) {
+					if (event.key === "Escape") {
+						prozor.style.display = "none";
+					}
+				});
+			}
+			
 			function prikaziDetaljeKnjige(knjiga) {
 				const modal = document.getElementById("detaljiModal");
 
@@ -473,9 +520,6 @@
 				document.getElementById("detaljiStatus").textContent = knjiga.status || "N/A";
 				document.getElementById("detaljiZanr").textContent = knjiga.zanr;
 				document.getElementById("detaljiJezik").textContent = knjiga.jezik;
-				
-				document.getElementById("detaljiKorisnik").textContent = knjiga.korisnik || "—";
-				document.getElementById("detaljiDatum").textContent = knjiga.datumZaduzenja || "—";
 
 				modal.style.display = "flex"; // ili "block", zavisi od CSS-a
 
@@ -488,9 +532,7 @@
 				}
 				document.addEventListener("keydown", escListener);
 			}
-
 			
-
 			document.querySelector(".closeDetalji").addEventListener("click", () => {
 				document.getElementById("detaljiModal").style.display = "none";
 			});
@@ -500,9 +542,8 @@
 				if (event.target === modal) {
 					modal.style.display = "none";
 				}
-				
-				
 			});
+
 			
 
 			function otvoriTab(evt, tabId) {

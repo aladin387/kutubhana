@@ -1,5 +1,6 @@
 package com.kutubhana.demo.controller;
 
+import com.kutubhana.demo.DTO.ZaduzenjeDTO;
 import com.kutubhana.demo.model.Knjige;
 import com.kutubhana.demo.model.Korisnici;
 import com.kutubhana.demo.model.Zaduzenje;
@@ -59,7 +60,6 @@ public class ZaduzenjeController {
     }
 
 
-
     @PostMapping("/razduzi")
     public ResponseEntity<?> razduzi(@RequestParam Long knjigaId) {
         Knjige knjiga = knjigaRepo.findById(knjigaId)
@@ -88,6 +88,48 @@ public class ZaduzenjeController {
                 .map(Zaduzenje::getKorisnici)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/korisnik/{id}")
+    public ResponseEntity<List<ZaduzenjeDTO>> getAktivnaZaduzenjaZaKorisnika(@PathVariable Long id) {
+        Optional<Korisnici> korisnikOpt = korisniciRepo.findById(id);
+        if (korisnikOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Zaduzenje> aktivnaZaduzenja = zaduzenjeRepo.findByKorisniciAndDatumRazduzenjaIsNull(korisnikOpt.get());
+
+        List<ZaduzenjeDTO> rezultat = aktivnaZaduzenja.stream().map(z -> {
+            ZaduzenjeDTO dto = new ZaduzenjeDTO();
+            dto.setNaslov(z.getKnjiga().getNaslov());
+            dto.setDatumZaduzenja(z.getDatumZaduzenja());
+            dto.setDatumRazduzenja(z.getDatumRazduzenja());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(rezultat);
+    }
+
+
+    @GetMapping("/korisnik/{id}/historija")
+    public ResponseEntity<List<ZaduzenjeDTO>> getHistorijaZaduzenja(@PathVariable Long id) {
+        Optional<Korisnici> korisnikOpt = korisniciRepo.findById(id);
+        if (korisnikOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // ✅ Bitna izmjena: koristimo ID umjesto objekta Korisnici
+        List<Zaduzenje> historija = zaduzenjeRepo.findByKorisniciId(id);
+
+        List<ZaduzenjeDTO> rezultat = historija.stream().map(z -> {
+            ZaduzenjeDTO dto = new ZaduzenjeDTO();
+            dto.setNaslov(z.getKnjiga().getNaslov());
+            dto.setDatumZaduzenja(z.getDatumZaduzenja());
+            dto.setDatumRazduzenja(z.getDatumRazduzenja());
+            return dto;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(rezultat);
     }
 
 }

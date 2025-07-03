@@ -5,6 +5,7 @@ import com.kutubhana.demo.mapper.KnjigeMapper;
 import com.kutubhana.demo.model.Knjige;
 import com.kutubhana.demo.repository.KnjigeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
@@ -34,10 +35,22 @@ public class KnjigeController {
         return knjigaRepo.save(knjiga);
     }
 
+
     @DeleteMapping("/{id}")
-    public void obrisiKnjigu(@PathVariable Long id) {
-        knjigaRepo.deleteById(id);
+    public ResponseEntity<?> obrisiKnjigu(@PathVariable Long id) {
+        Knjige knjiga = knjigaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Knjiga nije pronađena"));
+
+        if (!knjiga.isDostupna()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Knjiga je trenutno zadužena i ne može se obrisati.");
+        }
+
+        knjigaRepo.delete(knjiga);
+        return ResponseEntity.ok().build();
     }
+
 
     @PutMapping("/{id}")
     public Knjige izmijeniKnjigu(@PathVariable Long id, @RequestBody Knjige nova) {
@@ -61,8 +74,4 @@ public class KnjigeController {
         if (jezik != null) return knjigaRepo.findByJezikContainingIgnoreCase(jezik);
         return List.of();
     }
-
-
-
-
 }

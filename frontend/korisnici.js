@@ -258,52 +258,149 @@
 				fetch("http://localhost:8080/api/zaduzenja/aktivni-korisnici")
 					.then(response => response.json())
 					.then(data => {
-						const zaduzeniKorisnici = data;
-						const rows = document.querySelectorAll("#listaKorisnika tbody tr");
+										const zaduzeniKorisnici = data;
+										const rows = document.querySelectorAll("#listaKorisnika tbody tr");
 
-						rows.forEach(row => {
-							const userId = row.cells[0].textContent.trim();
-							const usernameCell = row.cells[1];
+										rows.forEach(row => {
+														const userId = row.cells[0].textContent.trim();
+														const usernameCell = row.cells[1];
 
-							const isZaduzen = zaduzeniKorisnici.some(korisnik => korisnik.id == userId);
+														const isZaduzen = zaduzeniKorisnici.some(korisnik => korisnik.id == userId);
 
-							// Dodaj klasu i tooltip ako je korisnik zadužen
-							if (isZaduzen) {
-								usernameCell.classList.add("korisnik-zaduzen");
-								usernameCell.title = "📚 Ima zaduženu knjigu";
-							} else {
-								usernameCell.classList.remove("korisnik-zaduzen");
-								usernameCell.title = "";
-							}
+														// Dodaj klasu i tooltip ako je korisnik zadužen
+														if (isZaduzen) {
+															usernameCell.classList.add("korisnik-zaduzen");
+															usernameCell.title = "📚 Ima zaduženu knjigu";
+														} else {
+															usernameCell.classList.remove("korisnik-zaduzen");
+															usernameCell.title = "";
+														}
 
-							usernameCell.style.cursor = "pointer";
+														usernameCell.style.cursor = "pointer";
+														
+														
 
-							// Event listener za otvaranje korisničkog modala
-							usernameCell.addEventListener("click", () => {
-								
-								if (editKorisnikModUkljucen) return;
-								
-								const info = document.getElementById("korisnikInfo");
-								const naslov = document.getElementById("korisnikNaslov");
+													
+												//ova funkcija se zove kasnije....		
+											function formatDatum(isoDatum) {
+												if (!isoDatum) return "-";
+												const d = new Date(isoDatum);
+												return d.toLocaleDateString("sr-Latn", { year: 'numeric', month: 'short', day: 'numeric' });
+											} 
+														
+											
 
-								naslov.textContent = `Korisnik: ${usernameCell.textContent}`;
-								info.innerHTML = isZaduzen
-									? "📚 Trenutno ima zaduženu knjigu!"
-									: "✔ Nema aktivnih zaduženja.";
+											// Event listener za otvaranje korisničkog modala
+											usernameCell.addEventListener("click", async () => {
 
-								korisnikProzor.style.display = "flex";
+														if (editKorisnikModUkljucen) return;
 
-								function escListener(e) {
-									if (e.key === "Escape") {
-										korisnikProzor.style.display = "none";
-										document.removeEventListener("keydown", escListener);
-									}
-								}
-								document.addEventListener("keydown", escListener);
-							});
-						});
-					})
-					.catch(error => console.error("Greška pri dohvaćanju aktivnih korisnika:", error));
+														const info = document.getElementById("korisnikInfo");
+														const naslov = document.getElementById("korisnikNaslov");
+
+														naslov.innerHTML = `Zaduživanja knjiga:<br>${usernameCell.textContent}`;
+														info.innerHTML = ""; // Očistimo sadržaj
+
+														if (isZaduzen) {
+															const p = document.createElement("p");
+															p.textContent = "📚 Trenutno ima zaduženu knjigu!";
+															info.appendChild(p);
+
+															try {
+																const res = await fetch(`http://localhost:8080/api/zaduzenja/korisnik/${userId}`);
+																const knjige = await res.json();
+
+																if (knjige.length > 0) {
+																	const lista = document.createElement("ul");
+																	lista.style.marginTop = "10px";
+																	knjige.forEach(knjiga => {
+																		const item = document.createElement("li");
+																		item.textContent = `${knjiga.naslov} (zaduženo: ${knjiga.datumZaduzenja})`;
+																		lista.appendChild(item);
+																	});
+																	info.appendChild(lista);
+																} else {
+																	const p = document.createElement("p");
+																	p.textContent = "⚠ Nema dostupnih podataka o zaduženim knjigama.";
+																	info.appendChild(p);
+																}
+															} catch (err) {
+																console.error("Greška pri dohvaćanju zaduženih knjiga:", err);
+																const errorMsg = document.createElement("p");
+																errorMsg.textContent = "⚠ Greška pri učitavanju zaduženih knjiga.";
+																info.appendChild(errorMsg);
+															}
+														} else {
+															info.textContent = "✔ Nema aktivnih zaduženja.";
+														}
+														
+														// HISTORIJA ZADUŽENJA
+													try {
+														const resHistorija = await fetch(`http://localhost:8080/api/zaduzenja/korisnik/${userId}/historija`);
+														const historija = await resHistorija.json();
+
+														const naslovHistorije = document.createElement("h4");
+														naslovHistorije.textContent = "📖 Historija zaduženja";
+														naslovHistorije.style.marginTop = "20px";
+														naslovHistorije.style.color = "#333";
+														info.appendChild(naslovHistorije);
+
+														if (historija.length > 0) {
+															const container = document.createElement("div");
+															container.style.marginTop = "10px";
+
+															historija
+																.filter(z => z.datumRazduzenja)
+																.forEach(z => {
+																	const kartica = document.createElement("div");
+																	kartica.style.border = "1px solid #ddd";
+																	kartica.style.borderRadius = "6px";
+																	kartica.style.padding = "10px";
+																	kartica.style.marginBottom = "8px";
+																	kartica.style.backgroundColor = "#f9f9f9";
+																	kartica.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+																	kartica.innerHTML = `
+																		<p><strong>📘 Naslov:</strong> ${z.naslov}</p>
+																		<p><strong>📅 Zaduženo:</strong> ${formatDatum(z.datumZaduzenja)}</p>
+																		<p><strong>📤 Razduženo:</strong> ${
+																			z.datumRazduzenja 
+																				? formatDatum(z.datumRazduzenja) 
+																				: '<span style="color:red;">📚 Još uvijek zaduženo</span>'
+																		}</p>
+																	`;
+
+																	container.appendChild(kartica);
+																});
+
+															info.appendChild(container);
+
+														} else {
+															const p = document.createElement("p");
+															p.textContent = "Nema historije zaduženja.";
+															info.appendChild(p);
+															}	
+													
+													} catch (err) {
+														console.error("Greška pri dohvaćanju historije:", err);
+														const p = document.createElement("p");
+														p.textContent = "⚠ Greška pri učitavanju historije zaduženja.";
+														info.appendChild(p);
+														}
+
+
+														korisnikProzor.style.display = "flex";
+
+														function escListener(e) {
+															if (e.key === "Escape") {
+																korisnikProzor.style.display = "none";
+																document.removeEventListener("keydown", escListener);
+															}
+														}
+														document.addEventListener("keydown", escListener);
+											});
+
+										});
+								}).catch(error => console.error("Greška pri dohvaćanju aktivnih korisnika:", error));
 
 				// Klik na X dugme za zatvaranje korisničkog modala
 				document.querySelector(".zatvori-korisnik").addEventListener("click", () => {
@@ -330,3 +427,47 @@
 				}
 			});
 
+
+let currentSortColumn = -1;
+let currentSortDirection = 1; // 1 = rastuće, -1 = opadajuće
+
+document.addEventListener("DOMContentLoaded", function () {
+  const table = document.getElementById("listaKorisnika");
+  const headers = table.querySelectorAll("th");
+
+  headers.forEach((header, index) => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => sortTableByColumn(index));
+  });
+});
+
+function sortTableByColumn(columnIndex) {
+  const table = document.getElementById("listaKorisnika");
+  const tbody = table.tBodies[0];
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  // Promena smera ako kliknemo na istu kolonu
+  if (columnIndex === currentSortColumn) {
+    currentSortDirection *= -1;
+  } else {
+    currentSortDirection = 1;
+    currentSortColumn = columnIndex;
+  }
+
+  rows.sort((a, b) => {
+    let cellA = a.cells[columnIndex].textContent.trim().toLowerCase();
+    let cellB = b.cells[columnIndex].textContent.trim().toLowerCase();
+
+    // Ako je broj, upoređuj kao broj
+    const isNumeric = !isNaN(cellA) && !isNaN(cellB);
+    if (isNumeric) {
+      return currentSortDirection * (parseFloat(cellA) - parseFloat(cellB));
+    }
+
+    return currentSortDirection * cellA.localeCompare(cellB);
+  });
+
+  // Očisti i ponovo dodaj sortirane redove
+  tbody.innerHTML = "";
+  rows.forEach(row => tbody.appendChild(row));
+}
