@@ -32,6 +32,12 @@ public class Knjige {
     private List<Zaduzenje> zaduzenja = new ArrayList<>();
 
 
+    @OneToMany(mappedBy = "knjiga", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PdfFile> pdfFiles = new ArrayList<>();
+
+
+
     public Long getId() {
         return id;
     }
@@ -86,5 +92,13 @@ public class Knjige {
 
     public void setZaduzenja(List<Zaduzenje> zaduzenja) {
         this.zaduzenja = zaduzenja;
+    }
+
+    public List<PdfFile> getPdfFiles() {
+        return pdfFiles;
+    }
+
+    public void setPdfFiles(List<PdfFile> pdfFiles) {
+        this.pdfFiles = pdfFiles;
     }
 }

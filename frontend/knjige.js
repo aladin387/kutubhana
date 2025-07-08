@@ -2,6 +2,7 @@
 			const API_URL = "http://localhost:8080/api/knjige";
 			
 			let editModUkljucen = false; // globalna varijabla da bi se u funkcijama za prikaz modula/prozora,  onemogućilo njihovo pojavljivanje dok traje editovanje
+			let aktivnaKnjigaId = null;
 
 
 			function ucitajKnjige() {
@@ -19,6 +20,8 @@
 							const dugmeAkcija = status.startsWith("Zadužena")
 								? `<button class="btn-razduzi" onclick="razduziKnjigu(${knjiga.id})">Razduži</button>`
 								: `<button class="btn-zaduzi" onclick="zaduziKnjigu(${knjiga.id})">Zaduži</button>`;
+								
+
 
 
 						row.innerHTML = `
@@ -511,7 +514,18 @@
 				});
 			}
 			
-			function prikaziDetaljeKnjige(knjiga) {
+			function prikaziDetaljeKnjige(knjiga) {			
+		
+				const fileInput = document.getElementById("modalPdfInput");
+				if (fileInput) fileInput.value = "";
+				
+				const pdfActionButton = document.getElementById("pdfActionButton"); 
+					if (pdfActionButton) {
+						pdfActionButton.textContent = "Odaberi fajl";
+						pdfReadyForUpload = false;
+					}
+
+				aktivnaKnjigaId = knjiga.id;
 				const modal = document.getElementById("detaljiModal");
 
 				document.getElementById("detaljiId").textContent = knjiga.id;
@@ -520,6 +534,8 @@
 				document.getElementById("detaljiStatus").textContent = knjiga.status || "N/A";
 				document.getElementById("detaljiZanr").textContent = knjiga.zanr;
 				document.getElementById("detaljiJezik").textContent = knjiga.jezik;
+				
+				prikaziPdfFajlove(aktivnaKnjigaId);		
 
 				modal.style.display = "flex"; // ili "block", zavisi od CSS-a
 
@@ -533,16 +549,16 @@
 				document.addEventListener("keydown", escListener);
 			}
 			
-			document.querySelector(".closeDetalji").addEventListener("click", () => {
-				document.getElementById("detaljiModal").style.display = "none";
-			});
+				document.querySelector(".closeDetalji").addEventListener("click", () => {
+					document.getElementById("detaljiModal").style.display = "none";
+				});
 
-			window.addEventListener("click", (event) => {
-				const modal = document.getElementById("detaljiModal");
-				if (event.target === modal) {
-					modal.style.display = "none";
-				}
-			});
+				window.addEventListener("click", (event) => {
+					const modal = document.getElementById("detaljiModal");
+					if (event.target === modal) {
+						modal.style.display = "none";
+					}
+				});
 
 			
 
@@ -573,6 +589,130 @@
 					window.location.href = "index.html";
 				}
 			});
+			
+			
+			function uploadPdfFromModal() {				
+				const fileInput = document.getElementById("modalPdfInput");
+				
+				if (!fileInput) {
+					alert("Fajl input nije pronađen.");
+					return;
+				}
+				if (!fileInput.files.length) {
+					console.log("⚠️ Nema izabranog fajla");
+					alert("Molimo izaberite PDF fajl za upload.");
+					return;
+				}
+
+				const file = fileInput.files[0];
+				if (!file) {
+					alert("Izaberite fajl.");
+					return;
+				}
+
+				if (file.type !== "application/pdf") {
+					alert("Dozvoljen je samo PDF fajl.");
+					return;
+				}
+				
+				const formData = new FormData();
+				formData.append("file", file);
+
+				fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/upload-pdf`, {
+					method: "POST",
+					body: formData
+				})
+				.then(res => {
+					if (!res.ok) {
+						return res.text().then(text => { throw new Error(text) });
+					}
+					return res.text();
+				})
+					.then(msg => {
+						alert(msg);
+						prikaziPdfFajlove(aktivnaKnjigaId);
+
+						
+
+						const modal = document.getElementById("detaljiModal");
+						if (modal) {
+							modal.style.display = "none";
+						}
+					})
+						.catch(err => {
+					alert("Greška pri uploadu: " + err.message);
+					});
+					
+			}
+			
+			
+			/* da bude jedan button za upload pdf u modalu*/
+			const pdfInput = document.getElementById("modalPdfInput");
+			const pdfActionButton = document.getElementById("pdfActionButton");
+
+			let pdfReadyForUpload = false;
+
+			pdfActionButton.addEventListener("click", () => {
+				if (!pdfReadyForUpload) {
+					pdfInput.click(); // Otvara file picker
+				} else {
+					// Poziva upload funkciju
+					uploadPdfFromModal();
+				}
+			});
+
+			// Reaguje kad korisnik izabere fajl
+			pdfInput.addEventListener("change", () => {
+				if (pdfInput.files.length > 0) {
+					pdfActionButton.textContent = "Potvrdi upload";
+					pdfReadyForUpload = true;
+				}
+			});
+			
+			
+function prikaziPdfFajlove(aktivnaKnjigaId) {
+	const pdfLinkContainer = document.getElementById("pdfLinkContainer");
+	if (!pdfLinkContainer) return;
+
+	// Očisti prethodni sadržaj
+	pdfLinkContainer.innerHTML = "<em>Učitavanje fajlova...</em>";
+
+	fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/pdf-files`)
+		.then(res => {
+			if (!res.ok) {
+				throw new Error("Neuspješno učitavanje PDF fajlova.");
+			}
+			return res.json();
+		})
+		.then(data => {
+			if (data.length === 0) {
+				pdfLinkContainer.innerHTML = "<em>Nema dostupnih PDF fajlova.</em>";
+				return;
+			}
+
+			pdfLinkContainer.innerHTML = ""; // Očisti placeholder
+
+			data.forEach(pdf => {
+				const link = document.createElement("a");
+				link.href = `http://localhost:8080${pdf.downloadUrl}`;
+				link.textContent = `📥 ${pdf.fileName}`;
+				link.target = "_blank";
+				link.rel = "noopener noreferrer";
+
+				const br = document.createElement("br");
+
+				pdfLinkContainer.appendChild(link);
+				pdfLinkContainer.appendChild(br);
+			});
+		})
+		.catch(err => {
+			console.error("Greška pri učitavanju PDF fajlova:", err);
+			pdfLinkContainer.innerHTML = "<em>Greška pri učitavanju PDF fajlova.</em>";
+		});
+}
+
+
+
 
 
 
@@ -581,3 +721,5 @@
 			
 
 			ucitajKnjige();
+			
+			

@@ -110,6 +110,8 @@
 			<ul class="tabovi">
 			  <li class="tab active" onclick="otvoriTab(event, 'osnovni')">📖 Osnovni podaci</li>
 			  <li class="tab" onclick="otvoriTab(event, 'zaduzenje')">👤 Zaduženje</li>
+			  <li class="tab" onclick="otvoriTab(event, 'pdf')">📎 PDF</li>
+
 			</ul>
 
 			<div id="osnovni" class="tab-sadrzaj active">
@@ -122,8 +124,18 @@
 
 			<div id="zaduzenje" class="tab-sadrzaj">
 			  <p><strong>Status:</strong> <span id="detaljiStatus"></span></p>
+			</div>
+			
+			
+			<div id="pdf" class="tab-sadrzaj">
+				<p><strong>Upload PDF fajla:</strong></p>
+				<input type="file" id="modalPdfInput" accept="application/pdf" style="display: none;" />
+				<button id="pdfActionButton">Odaberi fajl</button>
+				<p><strong>Preuzmi PDF fajlove:</strong></p>
+				<div id="pdfLinkContainer" style="margin-bottom: 10px;"></div>
 
 			</div>
+
 		  </div>
 		</div>
 		
@@ -137,6 +149,10 @@
 			<p id="autorDetalji"></p>
 		  </div>
 		</div>
+		
+		
+		
+		
 
 
 
