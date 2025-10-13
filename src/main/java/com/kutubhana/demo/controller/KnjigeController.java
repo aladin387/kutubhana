@@ -94,7 +94,11 @@ public class KnjigeController {
 
 
     @PostMapping("/{id}/upload-pdf")
-    public ResponseEntity<String> uploadPdfZaKnjigu(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadPdfZaKnjigu(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("naziv") String naziv  // ⬅️ ovo je ključno
+    ) {
         try {
             Optional<Knjige> knjigaOpt = knjigaRepo.findById(id);
             if (knjigaOpt.isEmpty()) {
@@ -116,13 +120,23 @@ public class KnjigeController {
             }
 
             // Unikatno ime fajla da se ne prepiše
-            String filename = "knjiga_" + id + "_" + System.currentTimeMillis() + ".pdf";
-            File destination = new File(uploadDir + filename);
+            String safeNaziv = naziv.replaceAll("[^a-zA-Z0-9-_\\. ]", "_");
+            if (!safeNaziv.toLowerCase().endsWith(".pdf")) {
+                safeNaziv += ".pdf";
+            }
+
+            File destination = new File(uploadDir + safeNaziv);
+            if (destination.exists()) {
+                String baseName = safeNaziv.replaceAll("\\.pdf$", "");
+                safeNaziv = baseName + "_" + System.currentTimeMillis() + ".pdf";
+                destination = new File(uploadDir + safeNaziv);
+            }
+
             file.transferTo(destination);
 
             // Kreiraj novi PdfFile entitet i poveži sa knjigom
             PdfFile pdfFile = new PdfFile();
-            pdfFile.setFilename(filename);
+            pdfFile.setFilename(safeNaziv);
             pdfFile.setPath(destination.getAbsolutePath());
             pdfFile.setKnjiga(knjigaOpt.get());
 
@@ -188,9 +202,67 @@ public class KnjigeController {
         return ResponseEntity.ok(pdfFilesInfo);
     }
 
+    @DeleteMapping("/pdf-file/{pdfId}")
+    public ResponseEntity<String> obrisiPdf(@PathVariable Long pdfId) {
+        Optional<PdfFile> pdfFileOpt = pdfFileRepo.findById(pdfId);
+        if (pdfFileOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
+        PdfFile pdfFile = pdfFileOpt.get();
 
+        // 1. Obriši fajl sa diska
+        File file = new File(pdfFile.getPath());
+        if (file.exists() && !file.delete()) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Greška pri brisanju fajla sa diska.");
+        }
 
+        // 2. Obriši zapis iz baze
+        pdfFileRepo.delete(pdfFile);
+
+        return ResponseEntity.ok("PDF fajl uspešno obrisan.");
+    }
+
+    @PatchMapping("/pdf-file/{pdfId}")
+    public ResponseEntity<String> izmijeniNazivPdfFajla(@PathVariable Long pdfId,
+                                                        @RequestParam("noviNaziv") String noviNaziv) {
+        Optional<PdfFile> pdfFileOpt = pdfFileRepo.findById(pdfId);
+        if (pdfFileOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        PdfFile pdfFile = pdfFileOpt.get();
+        File stariFajl = new File(pdfFile.getPath());
+
+        // Sanitizuj naziv (dozvoli samo osnovne karaktere, bez / \ itd.)
+        String safeNaziv = noviNaziv.replaceAll("[^a-zA-Z0-9-_\\. ]", "_");
+        if (!safeNaziv.toLowerCase().endsWith(".pdf")) {
+            safeNaziv += ".pdf";
+        }
+
+        File noviFajl = new File(stariFajl.getParent(), safeNaziv);
+
+        // Ako fajl sa novim nazivom već postoji, dodaj timestamp
+        if (noviFajl.exists()) {
+            String baseName = safeNaziv.replaceAll("\\.pdf$", "");
+            safeNaziv = baseName + "_" + System.currentTimeMillis() + ".pdf";
+            noviFajl = new File(stariFajl.getParent(), safeNaziv);
+        }
+
+        boolean renameOK = stariFajl.renameTo(noviFajl);
+        if (!renameOK) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Neuspješno preimenovanje fajla na disku.");
+        }
+
+        // Ažuriraj podatke u bazi
+        pdfFile.setFilename(safeNaziv);
+        pdfFile.setPath(noviFajl.getAbsolutePath());
+        pdfFileRepo.save(pdfFile);
+
+        return ResponseEntity.ok("Naziv PDF fajla je uspješno izmijenjen.");
+    }
 
 
 }

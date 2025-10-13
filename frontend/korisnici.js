@@ -340,7 +340,7 @@
 														const historija = await resHistorija.json();
 
 														const naslovHistorije = document.createElement("h4");
-														naslovHistorije.textContent = "📖 Historija zaduženja";
+														naslovHistorije.textContent = "📖 Historija zaduženja:";
 														naslovHistorije.style.marginTop = "20px";
 														naslovHistorije.style.color = "#333";
 														info.appendChild(naslovHistorije);

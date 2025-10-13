@@ -591,59 +591,54 @@
 			});
 			
 			
-			function uploadPdfFromModal() {				
-				const fileInput = document.getElementById("modalPdfInput");
-				
-				if (!fileInput) {
-					alert("Fajl input nije pronađen.");
-					return;
-				}
-				if (!fileInput.files.length) {
-					console.log("⚠️ Nema izabranog fajla");
-					alert("Molimo izaberite PDF fajl za upload.");
-					return;
-				}
+function uploadPdfFromModal() {
+  const fileInput = document.getElementById("modalPdfInput");
+  const customNameInput = document.getElementById("customPdfName");
 
-				const file = fileInput.files[0];
-				if (!file) {
-					alert("Izaberite fajl.");
-					return;
-				}
+  if (!fileInput || !fileInput.files.length) {
+    alert("Molimo izaberite PDF fajl za upload.");
+    return;
+  }
 
-				if (file.type !== "application/pdf") {
-					alert("Dozvoljen je samo PDF fajl.");
-					return;
-				}
-				
-				const formData = new FormData();
-				formData.append("file", file);
+  const file = fileInput.files[0];
+  if (file.type !== "application/pdf") {
+    alert("Dozvoljen je samo PDF fajl.");
+    return;
+  }
 
-				fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/upload-pdf`, {
-					method: "POST",
-					body: formData
-				})
-				.then(res => {
-					if (!res.ok) {
-						return res.text().then(text => { throw new Error(text) });
-					}
-					return res.text();
-				})
-					.then(msg => {
-						alert(msg);
-						prikaziPdfFajlove(aktivnaKnjigaId);
+  const customFileName = customNameInput.value.trim();
+  if (!customFileName) {
+    alert("Molimo unesite naziv fajla.");
+    return;
+  }
 
-						
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("naziv", customFileName + ".pdf");
 
-						const modal = document.getElementById("detaljiModal");
-						if (modal) {
-							modal.style.display = "none";
-						}
-					})
-						.catch(err => {
-					alert("Greška pri uploadu: " + err.message);
-					});
-					
-			}
+  fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/upload-pdf`, {
+    method: "POST",
+    body: formData
+  })
+    .then(res => {
+      if (!res.ok) {
+        return res.text().then(text => { throw new Error(text) });
+      }
+      return res.text();
+    })
+    .then(msg => {
+      alert(msg);
+      prikaziPdfFajlove(aktivnaKnjigaId);
+
+      // Reset
+      const modal = document.getElementById("detaljiModal");
+      if (modal) modal.style.display = "none";
+    })
+    .catch(err => {
+      alert("Greška pri uploadu: " + err.message);
+    });
+}
+
 			
 			
 			/* da bude jedan button za upload pdf u modalu*/
@@ -664,52 +659,215 @@
 			// Reaguje kad korisnik izabere fajl
 			pdfInput.addEventListener("change", () => {
 				if (pdfInput.files.length > 0) {
+				    const originalName = pdfInput.files[0].name;
+					const defaultName = originalName.replace(/\.pdf$/i, ""); // Bez ekstenzije
+
+					document.getElementById("customPdfName").value = defaultName;
+					document.getElementById("nazivPdfWrapper").style.display = "block";
 					pdfActionButton.textContent = "Potvrdi upload";
 					pdfReadyForUpload = true;
 				}
 			});
 			
 			
-function prikaziPdfFajlove(aktivnaKnjigaId) {
-	const pdfLinkContainer = document.getElementById("pdfLinkContainer");
-	if (!pdfLinkContainer) return;
+			function prikaziPdfFajlove(aktivnaKnjigaId) {
+						const pdfLinkContainer = document.getElementById("pdfLinkContainer");
+						if (!pdfLinkContainer) return;
 
-	// Očisti prethodni sadržaj
-	pdfLinkContainer.innerHTML = "<em>Učitavanje fajlova...</em>";
+						// Očisti prethodni sadržaj
+						pdfLinkContainer.innerHTML = "<em>Učitavanje fajlova...</em>";
 
-	fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/pdf-files`)
-		.then(res => {
-			if (!res.ok) {
-				throw new Error("Neuspješno učitavanje PDF fajlova.");
+						fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/pdf-files`)
+							.then(res => {
+								if (!res.ok) {
+									throw new Error("Neuspješno učitavanje PDF fajlova.");
+								}
+								return res.json();
+							})
+				.then(data => {
+					if (data.length === 0) {
+						pdfLinkContainer.innerHTML = "<em>Nema dostupnih PDF fajlova.</em>";
+						return;
+					}
+
+					pdfLinkContainer.innerHTML = ""; // Očisti placeholder
+
+					data.forEach(pdf => {
+						// Kontejner za red sa linkom + dugme
+						const container = document.createElement("div");
+						container.style.display = "flex";
+						container.style.alignItems = "center";
+						container.style.marginBottom = "5px";
+						
+						const nazivElement = document.createElement("span");
+						nazivElement.style.flexGrow = "1";
+
+						// Link za download
+						const link = document.createElement("a");
+						link.href = `http://localhost:8080${pdf.downloadUrl}`;
+						link.textContent = `📥 ${pdf.fileName}`;
+						link.target = "_blank";
+						link.rel = "noopener noreferrer";
+						
+						nazivElement.appendChild(link);
+						
+						const dugmadContainer = document.createElement("div");
+						dugmadContainer.style.display = "flex";
+						dugmadContainer.style.gap = "5px";  
+
+						// Dugme za brisanje
+						const deleteBtn = document.createElement("button");
+						deleteBtn.textContent = "🗑️";
+						deleteBtn.style.backgroundColor = "#e74c3c";
+						deleteBtn.style.color = "white";
+						deleteBtn.style.border = "none";
+						deleteBtn.style.padding = "3px 6px";
+						deleteBtn.style.borderRadius = "3px";
+						deleteBtn.style.cursor = "pointer";
+						
+						// Dugme za edit
+						const editBtn = document.createElement("button");
+						editBtn.textContent = "🖉";
+						editBtn.style.backgroundColor = "#3498db";
+						editBtn.style.color = "white";
+						editBtn.style.border = "none";
+						editBtn.style.padding = "3px 6px";
+						editBtn.style.borderRadius = "3px";
+						editBtn.style.cursor = "pointer";
+						
+						dugmadContainer.appendChild(editBtn);
+						dugmadContainer.appendChild(deleteBtn);
+
+						// Event listener za brisanje
+						deleteBtn.addEventListener("click", () => {
+							if (confirm("Da li sigurno želite obrisati ovaj PDF fajl?")) {
+								fetch(`http://localhost:8080/api/knjige/pdf-file/${pdf.id}`, {
+									method: "DELETE"
+								})
+								.then(res => {
+									if (!res.ok) throw new Error("Greška pri brisanju fajla.");
+									return res.text();
+								})
+								.then(msg => {
+									alert(msg);
+									prikaziPdfFajlove(aktivnaKnjigaId); // ponovo učitaj
+								})
+								.catch(err => {
+									alert("Greška: " + err.message);
+								});
+							}
+						});
+						
+
+
+						
+						// Event listener za editovanje 						
+						editBtn.addEventListener("click", () => {
+							const input = document.createElement("input");
+							input.type = "text";
+							input.value = pdf.fileName.replace(/\.pdf$/i, ""); // bez .pdf ekstenzije
+							input.style.flex = "1";
+
+							const saveBtn = document.createElement("button");
+							saveBtn.textContent = "💾";
+							saveBtn.style.padding = "3px 6px";
+							saveBtn.style.cursor = "pointer";
+
+							const cancelBtn = document.createElement("button");
+							cancelBtn.textContent = "✖";
+							cancelBtn.style.padding = "3px 6px";
+							cancelBtn.style.cursor = "pointer";
+							
+							function sacuvaj() {
+								const noviNaziv = input.value.trim();
+								if (!noviNaziv) {
+									alert("Naziv fajla ne može biti prazan.");
+									return;
+								}
+								fetch(`http://localhost:8080/api/knjige/pdf-file/${pdf.id}?noviNaziv=${encodeURIComponent(noviNaziv)}`, {
+									method: "PATCH"
+								})
+								.then(res => {
+									if (!res.ok) throw new Error("Greška pri izmjeni naziva.");
+									return res.text();
+								})
+								.then(msg => {
+									alert(msg);
+									prikaziPdfFajlove(aktivnaKnjigaId); // reload
+								})
+								.catch(err => {
+									alert("Greška: " + err.message);
+								});
+							}
+
+							// Event za tipke Enter i Escape na inputu
+							input.addEventListener("keydown", (e) => {
+								if (e.key === "Enter") {
+									sacuvaj();
+								} else if (e.key === "Escape") {
+									prikaziPdfFajlove(aktivnaKnjigaId);
+								}
+							});
+
+							// Sačuvaj na klik dugmeta
+							saveBtn.addEventListener("click", sacuvaj);
+
+							// Otkaži na klik dugmeta
+							cancelBtn.addEventListener("click", () => {
+								prikaziPdfFajlove(aktivnaKnjigaId);
+							});
+
+							nazivElement.innerHTML = "";
+							nazivElement.appendChild(input);
+
+							// Zamijeni dugmad
+							const dugmad = [editBtn, deleteBtn];
+							dugmad.forEach(btn => btn.style.display = "none");
+							container.appendChild(saveBtn);
+							container.appendChild(cancelBtn);
+
+							// Sačuvaj novi naziv
+							saveBtn.addEventListener("click", () => {
+								const noviNaziv = input.value.trim();
+								if (!noviNaziv) {
+									alert("Naziv fajla ne može biti prazan.");
+									return;
+								}
+
+								fetch(`http://localhost:8080/api/knjige/pdf-file/${pdf.id}?noviNaziv=${encodeURIComponent(noviNaziv)}`, {
+									method: "PATCH"
+								})
+									.then(res => {
+										if (!res.ok) throw new Error("Greška pri izmjeni naziva.");
+										return res.text();
+									})
+									.then(msg => {
+										alert(msg);
+										prikaziPdfFajlove(aktivnaKnjigaId); // reload
+									})
+									.catch(err => {
+										alert("Greška: " + err.message);
+									});
+							});
+
+							// Otkaži uređivanje
+							cancelBtn.addEventListener("click", () => {
+								prikaziPdfFajlove(aktivnaKnjigaId);
+							});
+						});
+
+								// Dodaj u kontejner
+								container.appendChild(nazivElement);
+								container.appendChild(dugmadContainer);
+
+								// Dodaj u glavni prikaz
+								pdfLinkContainer.appendChild(container);
+							});
+						}).catch(err => {
+								console.error("Greška pri učitavanju PDF fajlova:", err);
+								pdfLinkContainer.innerHTML = "<em>Greška pri učitavanju PDF fajlova.</em>";
+							});
 			}
-			return res.json();
-		})
-		.then(data => {
-			if (data.length === 0) {
-				pdfLinkContainer.innerHTML = "<em>Nema dostupnih PDF fajlova.</em>";
-				return;
-			}
-
-			pdfLinkContainer.innerHTML = ""; // Očisti placeholder
-
-			data.forEach(pdf => {
-				const link = document.createElement("a");
-				link.href = `http://localhost:8080${pdf.downloadUrl}`;
-				link.textContent = `📥 ${pdf.fileName}`;
-				link.target = "_blank";
-				link.rel = "noopener noreferrer";
-
-				const br = document.createElement("br");
-
-				pdfLinkContainer.appendChild(link);
-				pdfLinkContainer.appendChild(br);
-			});
-		})
-		.catch(err => {
-			console.error("Greška pri učitavanju PDF fajlova:", err);
-			pdfLinkContainer.innerHTML = "<em>Greška pri učitavanju PDF fajlova.</em>";
-		});
-}
 
 
 
