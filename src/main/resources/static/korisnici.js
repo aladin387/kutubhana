@@ -35,6 +35,7 @@
 
 			function dodajKorisnika() {
 				const username = document.getElementById("username").value.trim();
+				const password = document.getElementById("password").value.trim();
 				const email = document.getElementById("email").value.trim();
 				const phone = document.getElementById("phone").value.trim();
 				const address = document.getElementById("address").value.trim();
@@ -44,8 +45,14 @@
 					document.getElementById("username").focus(); // korisnik vidi gdje treba da upiše
 					return;
 				}
+				if (!password) {
+					alert("Lozinka je obavezna");
+					document.getElementById("password").focus();
+					return;
+				}
 
-				const korisnik = { username, email, phone, address };
+
+				const korisnik = { username, password, email, phone, address };
 
 
 				fetch(API_URL, {
@@ -56,6 +63,7 @@
 				.then(() => {
 					ucitajKorisnike();
 					document.getElementById("username").value = "";
+					document.getElementById("password").value = "";
 					document.getElementById("email").value = "";
 					document.getElementById("phone").value = "";
 					document.getElementById("address").value = "";

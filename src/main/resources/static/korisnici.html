@@ -16,6 +16,7 @@
 				<span id="zatvoriModal" style="float: right; cursor: pointer;">&times;</span>
 				<h3>Dodaj novog korisnika</h3>
 				<label>Ime i prezime: <input type="text" id="username" placeholder="Obavezno polje" /></label><br>
+				<label>Lozinka: <input type="password" id="password" placeholder="Obavezno polje" /></label><br>
 				<label>E - Mail: <input type="text" id="email" placeholder="Opcionalno" /></label><br>
 				<label>Telefon: <input type="text" id="phone" placeholder="Opcionalno" /></label><br>			
 				<label>Adresa: <input type="text" id="address" placeholder="Opcionalno" /></label><br>
@@ -56,14 +57,21 @@
 		</nav>
 	
 		
-<div id="korisnikProzor" class="korisnik-overlay">
-  <div class="korisnik-kartica">
-    <span class="zatvori-korisnik">&times;</span>
-    <h2 id="korisnikNaslov">Podaci o korisniku</h2>
-    <div id="korisnikInfo"></div> 
-    <div id="buttonsWrapper"></div>
-  </div>
-</div>
+		<div id="korisnikProzor" class="korisnik-overlay">
+		  <div class="korisnik-kartica">
+			<span class="zatvori-korisnik">&times;</span>
+			<h2 id="korisnikNaslov">Podaci o korisniku</h2>
+			<div id="korisnikInfo"></div> 
+			<div id="buttonsWrapper"></div>
+		  </div>
+		</div>
+		
+		
+		<form action="/logout" method="post" class="logout-form">
+			<button type="submit" class="logout-button">
+				<i class="fas fa-power-off"></i> Logout
+			</button>
+		</form>
 
 
 

@@ -535,6 +535,11 @@
 				document.getElementById("detaljiZanr").textContent = knjiga.zanr;
 				document.getElementById("detaljiJezik").textContent = knjiga.jezik;
 				
+				document.getElementById("detaljiIzdavac").textContent = knjiga.izdavac;
+				document.getElementById("detaljiGodina").textContent = knjiga.godinaIzdavanja;
+				document.getElementById("detaljiIsbn").textContent = knjiga.isbn;
+				document.getElementById("detaljiZabiljeska").textContent = knjiga.zabiljeska;
+				
 				prikaziPdfFajlove(aktivnaKnjigaId);		
 
 				modal.style.display = "flex"; // ili "block", zavisi od CSS-a

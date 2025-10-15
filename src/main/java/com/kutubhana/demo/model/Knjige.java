@@ -36,6 +36,13 @@ public class Knjige {
     @JsonManagedReference
     private List<PdfFile> pdfFiles = new ArrayList<>();
 
+    private String izdavac;
+    private Integer godinaIzdavanja;
+    private String isbn;
+
+    @Lob
+    private String zabiljeska;
+
 
 
     public Long getId() {
@@ -100,5 +107,37 @@ public class Knjige {
 
     public void setPdfFiles(List<PdfFile> pdfFiles) {
         this.pdfFiles = pdfFiles;
+    }
+
+    public String getIzdavac() {
+        return izdavac;
+    }
+
+    public void setIzdavac(String izdavac) {
+        this.izdavac = izdavac;
+    }
+
+    public Integer getGodinaIzdavanja() {
+        return godinaIzdavanja;
+    }
+
+    public void setGodinaIzdavanja(Integer godinaIzdavanja) {
+        this.godinaIzdavanja = godinaIzdavanja;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getZabiljeska() {
+        return zabiljeska;
+    }
+
+    public void setZabiljeska(String zabiljeska) {
+        this.zabiljeska = zabiljeska;
     }
 }

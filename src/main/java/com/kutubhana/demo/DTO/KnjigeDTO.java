@@ -1,5 +1,7 @@
 package com.kutubhana.demo.DTO;
 
+import jakarta.persistence.Lob;
+
 public class KnjigeDTO {
 
 
@@ -10,16 +12,25 @@ public class KnjigeDTO {
     private String jezik;
     private String status; // Dostupna ili Zadužena: ime korisnika
 
+    private String izdavac;
+    private Integer godinaIzdavanja;
+    private String isbn;
+    private String zabiljeska;
+
     public KnjigeDTO() {
     }
 
-    public KnjigeDTO(Long id, String naslov, String autor, String zanr, String jezik, String status) {
+    public KnjigeDTO(Long id, String naslov, String autor, String zanr, String jezik, String status, String izdavac, Integer godinaIzdavanja, String isbn, String zabiljeska) {
         this.id = id;
         this.naslov = naslov;
         this.autor = autor;
         this.zanr = zanr;
         this.jezik = jezik;
         this.status = status;
+        this.izdavac = izdavac;
+        this.godinaIzdavanja = godinaIzdavanja;
+        this.isbn = isbn;
+        this.zabiljeska = zabiljeska;
     }
 
     public Long getId() {
@@ -68,5 +79,37 @@ public class KnjigeDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getIzdavac() {
+        return izdavac;
+    }
+
+    public void setIzdavac(String izdavac) {
+        this.izdavac = izdavac;
+    }
+
+    public Integer getGodinaIzdavanja() {
+        return godinaIzdavanja;
+    }
+
+    public void setGodinaIzdavanja(Integer godinaIzdavanja) {
+        this.godinaIzdavanja = godinaIzdavanja;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getZabiljeska() {
+        return zabiljeska;
+    }
+
+    public void setZabiljeska(String zabiljeska) {
+        this.zabiljeska = zabiljeska;
     }
 }

@@ -20,6 +20,11 @@ public class Korisnici {
     private String phone;
     private String address;
 
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private UsersRoles role;
+
 
     @OneToMany(mappedBy = "korisnici", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "korisnik-zaduzenje")
@@ -74,5 +79,21 @@ public class Korisnici {
 
     public void setAddress(String adress) {
         this.address = adress;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public UsersRoles getRole() {
+        return role;
+    }
+
+    public void setRole(UsersRoles role) {
+        this.role = role;
     }
 }

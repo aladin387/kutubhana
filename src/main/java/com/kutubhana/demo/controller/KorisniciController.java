@@ -1,5 +1,11 @@
 package com.kutubhana.demo.controller;
 
+import com.kutubhana.demo.DTO.KorisniciDTO;
+import com.kutubhana.demo.DTO.KorisniciPasswordDTO;
+import com.kutubhana.demo.mapper.KorisniciMapper;
+import com.kutubhana.demo.service.KorisniciService;
+import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/korisnici")
@@ -20,35 +27,47 @@ public class KorisniciController {
     @Autowired
     private KorisniciRepository korisniciRepo;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private KorisniciService korisniciService;
+
+
     @GetMapping
-    public List<Korisnici> getAll() {
-        return korisniciRepo.findAll();
+    public List<KorisniciDTO> getAll() {
+        return korisniciService.getAllUsers()
+                .stream()
+                .map(KorisniciMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public Korisnici create(@RequestBody Korisnici korisnici) {
-        return korisniciRepo.save(korisnici);
+    public ResponseEntity<KorisniciDTO> create(@Valid @RequestBody KorisniciPasswordDTO dto) {
+        Korisnici saved = korisniciService.createUser(dto);
+        return ResponseEntity.ok(KorisniciMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Korisnici> update(@PathVariable Long id, @RequestBody Korisnici korisniciDetalji) {
-        Korisnici korisnici = korisniciRepo.findById(id)
+    public ResponseEntity<KorisniciDTO> update(@PathVariable Long id, @RequestBody KorisniciDTO dto) {
+        Korisnici korisnik = korisniciRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
 
-        korisnici.setUsername(korisniciDetalji.getUsername());
-        korisnici.setEmail(korisniciDetalji.getEmail());
-        korisnici.setPhone(korisniciDetalji.getPhone());
-        korisnici.setAddress(korisniciDetalji.getAddress());
+        korisnik.setUsername(dto.getUsername());
+        korisnik.setEmail(dto.getEmail());
+        korisnik.setPhone(dto.getPhone());
+        korisnik.setAddress(dto.getAddress());
+        korisnik.setRole(dto.getRole());
 
-        Korisnici azuriran = korisniciRepo.save(korisnici);
-        return ResponseEntity.ok(azuriran);
+        Korisnici updated = korisniciRepo.save(korisnik);
+        return ResponseEntity.ok(KorisniciMapper.toDTO(updated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Korisnici korisnici = korisniciRepo.findById(id)
+        Korisnici korisnik = korisniciRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
-        korisniciRepo.delete(korisnici);
+        korisniciRepo.delete(korisnik);
         return ResponseEntity.noContent().build();
     }
 }

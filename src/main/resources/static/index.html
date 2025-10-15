@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kutubhana MullaSadra</title>
+    
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			text-align: center;
+			padding: 60px;
+			background-image: url('https://images.unsplash.com/photo-1683871268982-a19153dbb35d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+			background-size: cover;
+			background-position: center;
+			background-attachment: fixed;
+			color: white;
+			position: relative;
+			z-index: 0; /* Osigurava da sadržaj ide preko ::before sloja */
+		}
+
+		body::before {
+			content: '';
+			position: fixed; /* Prekriva cijeli ekran, čak i kad se skroluje */
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.7);
+			z-index: -1; /* Ide ispod svega */
+			pointer-events: none; /* Ne ometa klikove ili hover */
+		}
+
+
+        h1 {
+            font-size: 3em;
+			color: #003366;
+		text-shadow:
+			0 0 5px white,
+			0 0 10px white,
+			0 0 15px white;
+		}
+
+
+
+		.nav-links {
+			display: flex;
+			justify-content: center; /* centriraj na velikim ekranima */
+			gap: 20px;
+			flex-wrap: wrap;
+			margin-top: 40px;
+		}
+
+		.nav-links a {
+			font-family: 'Arial', sans-serif;
+			display: inline-block;
+			padding: 14px 36px;
+			font-size: 16px;
+			text-decoration: none;
+			color: #fff;
+			background: linear-gradient(135deg, #3498db, #2980b9);
+			border-radius: 13px;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+			transition: transform 0.5s ease, box-shadow 0.5s ease;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+
+		.nav-links a:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 8px 15px rgba(41, 128, 185, 0.5);
+			background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+			color: #222;
+		}
+
+		/* ✅ Responsive: manji ekrani */
+		@media (max-width: 600px) {
+			.nav-links {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.nav-links a {
+				width: 80%; /* dugmad će biti šira i lakše kliknuti */
+				text-align: center;
+			}
+		}
+
+		/* za logout button */
+			.logout-form {
+				position: absolute;
+				top: 20px;
+				right: 20px;
+				margin: 0;
+			}
+			
+			.logout-icon-button {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background-color: #888888;  /* ili neka druga neutralna */
+			color: white;
+			border: none;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background-color 0.3s ease;
+			font-size: 18px;
+			}
+
+			.logout-icon-button:hover {
+				background-color: #555555;
+			}
+
+	</style>   
+</head>
+
+<body>
+
+<h1 id="animatedTitle"></h1>
+
+<br><br><br><br><br>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+	<div class="nav-links">
+		<a href="knjige.html"><i class="fas fa-book"></i> Lista knjiga</a>
+		<a href="korisnici.html"><i class="fas fa-users"></i> Lista korisnika</a>
+	</div>
+	
+	
+	<form action="/logout" method="post" class="logout-form">
+		<button type="submit" class="logout-button">
+			<i class="fas fa-power-off"></i> Logout
+		</button>
+	</form>
+	
+
+
+</body>
+</html>
+
+
+	<script>
+	  const text = "Dobrodošli u Kutubhana Mulla Sadra";
+	  const element = document.getElementById("animatedTitle");
+	  let index = 0;
+
+	  function typeWriter() {
+		if (index < text.length) {
+		  element.textContent += text.charAt(index);
+		  index++;
+		  setTimeout(typeWriter, 100); // pauza od 100ms između slova
+		}
+	  }
+
+	  typeWriter();
+	  
+	  document.addEventListener("DOMContentLoaded", () => {
+	  fetch("/api/knjige", {
+      method: "GET",
+      credentials: "include"  // važno za sesiju / kolačiće sa Spring Security
+		})
+		.then(response => {
+		  if (!response.ok) {
+			throw new Error("Nije uspeo fetch: " + response.status);
+		  }
+		  return response.json();
+		})
+		.then(data => {
+		  console.log("Podaci o knjigama:", data);
+		  // Ovde možeš da popuniš neki element sa podacima, npr. napraviš tabelu ili listu
+		  // Za sada ćemo samo u konzolu da ispišemo podatke
+		})
+		.catch(err => {
+		  console.error("Greška pri učitavanju knjiga:", err);
+		});
+	  });
+	</script>

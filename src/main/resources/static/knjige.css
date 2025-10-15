@@ -655,4 +655,32 @@
 			  cursor: pointer;
 			}
 			*/
+			
+			/* za logout button */
+			.logout-form {
+				position: absolute;
+				top: 20px;
+				right: 20px;
+				margin: 0;
+			}
+			
+			.logout-icon-button {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background-color: #888888;  /* ili neka druga neutralna */
+			color: white;
+			border: none;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			transition: background-color 0.3s ease;
+			font-size: 18px;
+			}
+
+			.logout-icon-button:hover {
+				background-color: #555555;
+			}
+
 

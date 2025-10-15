@@ -26,7 +26,11 @@ public class KnjigeMapper {
                 knjiga.getAutor(),
                 knjiga.getZanr(),
                 knjiga.getJezik(),
-                status
+                status,
+                knjiga.getIzdavac(),
+                knjiga.getGodinaIzdavanja(),
+                knjiga.getIsbn(),
+                knjiga.getZabiljeska()
         );
     }
 }
