@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,20 @@ public class KorisniciController {
                 .map(KorisniciMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<KorisniciDTO> getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build(); // korisnik nije ulogovan
+        }
+
+        // Pronađi korisnika po username-u iz Principal objekta
+        Korisnici korisnik = korisniciRepo.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
+
+        return ResponseEntity.ok(KorisniciMapper.toDTO(korisnik));
+    }
+
 
     @PostMapping
     public ResponseEntity<KorisniciDTO> create(@Valid @RequestBody KorisniciPasswordDTO dto) {

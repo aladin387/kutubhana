@@ -111,6 +111,49 @@
 			.logout-icon-button:hover {
 				background-color: #555555;
 			}
+			
+			
+			.content-boxes {
+			  display: flex;
+			  gap: 20px;
+			  margin-top: 30px;
+			  flex-wrap: wrap;
+			  justify-content: center;
+			}
+
+			.info-box {
+			  color: #003366;
+			  border: 2px solid #ccc;
+			  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+			  padding: 40px 50px;
+			  border-radius: 12px;
+			  width: 1200px;
+			  max-width: 95%;
+			  font-size: 2.4em; 
+			  line-height: 1.8;
+			  transition: transform 0.3s;
+			}
+
+
+
+			@keyframes zoomIn {
+			  0% {
+				opacity: 0;
+				transform: scale(0.6);
+			  }
+			  100% {
+				opacity: 1;
+				transform: scale(1);
+			  }
+			}
+			
+
+
+			.info-box.show {
+			  display: block !important; 
+			  animation: zoomIn 0.8s ease forwards;
+			}
+
 
 	</style>   
 </head>
@@ -135,45 +178,118 @@
 		</button>
 	</form>
 	
+	<br><br><br><br><br>
+	
+	<button id="showPublisherBtn">NOVO OD IZDAVAŠTVO MS</button>
+	<button id="showLibraryBtn">PREPORUKE</button>
+	<button id="showLibraryBtn">PULJKA KOJA NE RADI</button>
+	<button id="showLibraryBtn">JOŠ JEDNA KOJA NE RADI</button>
+
+
+	
+<div class="content-boxes">
+  <div class="info-box" id="publisherReleases" style="display:none;">
+    <ul>
+      <li>Filozofija Ahmeda Ašćerića (2023)</li>
+      <li>Eseji o iluminacijskoj školi Malika Valjevca (2024)</li>
+      <li>Autobiografija Muhameda Karamana (2025)</li>
+    </ul>
+  </div>
+
+  <div class="info-box" id="libraryReleases" style="display:none;">
+    <ul>
+      <li>Novi broj stripa Alan Ford (2023)</li>
+      <li>Zbirka poezije Kemala Malovčića</li>
+      <li>Povijest prosipanja iz šupljeg u prazno – 116. izdanje</li>
+    </ul>
+  </div>
+</div>
+	
 
 
 </body>
 </html>
 
 
-	<script>
-	  const text = "Dobrodošli u Kutubhana Mulla Sadra";
-	  const element = document.getElementById("animatedTitle");
-	  let index = 0;
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const element = document.getElementById("animatedTitle");
 
-	  function typeWriter() {
-		if (index < text.length) {
-		  element.textContent += text.charAt(index);
-		  index++;
-		  setTimeout(typeWriter, 100); // pauza od 100ms između slova
-		}
-	  }
-
-	  typeWriter();
-	  
-	  document.addEventListener("DOMContentLoaded", () => {
-	  fetch("/api/knjige", {
+    // 1. Fetch trenutno ulogovanog korisnika
+    fetch("/api/korisnici/me", {
       method: "GET",
-      credentials: "include"  // važno za sesiju / kolačiće sa Spring Security
-		})
-		.then(response => {
-		  if (!response.ok) {
-			throw new Error("Nije uspeo fetch: " + response.status);
-		  }
-		  return response.json();
-		})
-		.then(data => {
-		  console.log("Podaci o knjigama:", data);
-		  // Ovde možeš da popuniš neki element sa podacima, npr. napraviš tabelu ili listu
-		  // Za sada ćemo samo u konzolu da ispišemo podatke
-		})
-		.catch(err => {
-		  console.error("Greška pri učitavanju knjiga:", err);
-		});
-	  });
-	</script>
+      credentials: "include" // važno za Spring Security sesiju
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Neuspešan fetch korisnika");
+        }
+        return response.json();
+      })
+      .then(user => {
+        const username = user.username;
+        const text = `${username}, dobrodošli u Kutubhana Mulla Sadra`;
+        let index = 0;
+
+        function typeWriter() {
+          if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeWriter, 100); // pauza od 100ms između slova
+          }
+        }
+
+        typeWriter();
+      })
+      .catch(err => {
+        console.error("Greška pri dohvatanju korisnika:", err);
+        element.textContent = "Dobrodošli u Kutubhana Mulla Sadra"; // fallback ako korisnik nije ulogovan
+      });
+
+    // 2. Fetch lista knjiga (ostaje nepromenjeno)
+    fetch("/api/knjige", {
+      method: "GET",
+      credentials: "include"
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Nije uspeo fetch: " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Podaci o knjigama:", data);
+        // Ovdje možeš popuniti tabelu, kartice, itd.
+      })
+      .catch(err => {
+        console.error("Greška pri učitavanju knjiga:", err);
+      });
+  });
+  
+	document.getElementById("showPublisherBtn").addEventListener("click", () => {
+	  const publisherBox = document.getElementById("publisherReleases");
+	  const libraryBox = document.getElementById("libraryReleases");
+
+	  if (publisherBox.classList.contains("show")) {
+		publisherBox.classList.remove("show");
+	  } else {
+		publisherBox.classList.add("show");
+		libraryBox.classList.remove("show");
+	  }
+	});
+
+	document.getElementById("showLibraryBtn").addEventListener("click", () => {
+	  const publisherBox = document.getElementById("publisherReleases");
+	  const libraryBox = document.getElementById("libraryReleases");
+
+	  if (libraryBox.classList.contains("show")) {
+		libraryBox.classList.remove("show");
+	  } else {
+		libraryBox.classList.add("show");
+		publisherBox.classList.remove("show");
+	  }
+	});
+
+
+
+</script>

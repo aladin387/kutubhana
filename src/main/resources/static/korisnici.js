@@ -109,11 +109,13 @@
 					editKorisnikModUkljucen = true;
 					
 					const username = tr.querySelector(".username").textContent;
+					const password = tr.querySelector(".password").textContent;
 					const email = tr.querySelector(".email").textContent;
 					const phone = tr.querySelector(".phone").textContent;
 					const address = tr.querySelector(".address").textContent;
 					
 					tr.querySelector(".username").innerHTML = `<input type="text" value="${username}" data-original="${username}">`;
+					tr.querySelector(".password").innerHTML = `<input type="text" value="${password}" data-original="${password}">`;
 					tr.querySelector(".email").innerHTML = `<input type="text" value="${email}" data-original="${email}">`;
 					tr.querySelector(".phone").innerHTML = `<input type="text" value="${phone}" data-original="${phone}">`;
 					tr.querySelector(".address").innerHTML = `<input type="text" value="${address}" data-original="${address}">`;
@@ -130,6 +132,7 @@
 								event.preventDefault();
 
 								tr.querySelector(".username").textContent = username;
+								tr.querySelector(".password").textContent = password;
 								tr.querySelector(".email").textContent = email;
 								tr.querySelector(".phone").textContent = phone;
 								tr.querySelector(".address").textContent = address;
@@ -143,6 +146,7 @@
 				} else {
 					const noviKorisnik = {
 						username: tr.querySelector(".username input").value.trim(),
+						password: tr.querySelector(".password input").value.trim(),
 						email: tr.querySelector(".email input").value.trim(),
 						phone: tr.querySelector(".phone input").value.trim(),
 						address: tr.querySelector(".address input").value.trim()
@@ -159,6 +163,7 @@
 					})
 					.then(data => {
 						tr.querySelector(".username").textContent = data.username;
+						tr.querySelector(".password").textContent = data.password;
 						tr.querySelector(".email").textContent = data.email;
 						tr.querySelector(".phone").textContent = data.phone;
 						tr.querySelector(".address").textContent = data.address;
@@ -250,7 +255,6 @@
 				zatvoriFormu();
 			  }
 			});
-
 
 
 

@@ -1,70 +1,84 @@
 
 			const API_URL = "http://localhost:8080/api/knjige";
+
+			console.log("knjige.js je učitan");
+
 			
 			let editModUkljucen = false; // globalna varijabla da bi se u funkcijama za prikaz modula/prozora,  onemogućilo njihovo pojavljivanje dok traje editovanje
 			let aktivnaKnjigaId = null;
 
 
 			function ucitajKnjige() {
-				fetch(API_URL)
-					.then(res => res.json())
-					.then(data => {
+				fetch(API_URL, { credentials: 'include', redirect: 'manual' }) // šaljemo cookies i pratimo redirect
+					.then(res => {
+						console.log("Status:", res.status);
+						console.log("Content-Type:", res.headers.get("content-type"));
+
+						// Ako server vraća redirect (npr. na login) – preusmjeri browser
+						if (res.status === 401 || res.status === 403 || res.type === 'opaqueredirect') {
+							console.warn("Niste ulogovani. Preusmjeravam na login...");
+							window.location.href = '/login.html';
+							return;
+						}
+
+						return res.text(); // privremeno uzimamo kao tekst
+					})
+					.then(text => {
+						if (!text) return; // već smo preusmjereni
+
+						console.log("Odgovor servera:", text);
+
+						let data;
+						try {
+							data = JSON.parse(text); // pokušavamo parsirati JSON
+						} catch (e) {
+							console.error("Nevalidan JSON:", e);
+							return; // izlazimo iz funkcije ako nije JSON
+						}
+
 						const tbody = document.querySelector("#listaKnjiga tbody");
 						tbody.innerHTML = "";
 
 						data.forEach(knjiga => {
 							const row = document.createElement("tr");
-							
+
 							let status = knjiga.status || "N/A";
-							
+
 							const dugmeAkcija = status.startsWith("Zadužena")
 								? `<button class="btn-razduzi" onclick="razduziKnjigu(${knjiga.id})">Razduži</button>`
 								: `<button class="btn-zaduzi" onclick="zaduziKnjigu(${knjiga.id})">Zaduži</button>`;
+
+							row.innerHTML = `
+								<td class="id-klasa" style="cursor: pointer;">${knjiga.id}</td>
+								<td class="naslov" style="cursor: pointer;">${knjiga.naslov}</td>
+								<td class="autor" style="cursor: pointer;">${knjiga.autor}</td>
+								<td class="status">${status}</td>                                
+								<td class="zanr">${knjiga.zanr}</td>
+								<td class="jezik">${knjiga.jezik}</td>
+
+								<td class="akcije">
+									${status.startsWith("Zadužena")
+										? `<button class="btn-obrisi disabled-brisanje" onclick="alert('Knjiga je zadužena i ne može se obrisati.')">Obriši</button>`
+										: `<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>`}
+									<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${knjiga.id})">Izmijeni</button>
+									${dugmeAkcija}
+								</td>
+							`;
+
+							row.querySelector(".id-klasa").addEventListener("click", () => {
+								if (editModUkljucen) return;
+
 								
-
-
-
-						row.innerHTML = `
-							<td class="id-klasa" style="cursor: pointer;">${knjiga.id}</td>
-							<td class="naslov" style="cursor: pointer;">${knjiga.naslov}</td>
-							<td class="autor" style="cursor: pointer;">${knjiga.autor}</td>
-							<td class="status">${status}</td>								
-							<td class="zanr">${knjiga.zanr}</td>
-							<td class="jezik">${knjiga.jezik}</td>
-
-							<td class="akcije">
-								${status.startsWith("Zadužena")
-									? `<button class="btn-obrisi disabled-brisanje" onclick="alert('Knjiga je zadužena i ne može se obrisati.')">Obriši</button>`
-									: `<button class="btn-obrisi" onclick="obrisiKnjigu(${knjiga.id})">Obriši</button>`}
-								<button class="btn-izmijeni" onclick="toggleIzmjena(this, ${knjiga.id})">Izmijeni</button>
-								${dugmeAkcija}
-							</td>
-
-						`;
-						
-						row.querySelector(".id-klasa").addEventListener("click", () => {
-							if (editModUkljucen) return;
-							prikaziDetaljeKnjige(knjiga); //ovo bih možda trebao ukloniti?
-						});
-
-						row.querySelector(".naslov").addEventListener("click", () => {
-							if (editModUkljucen) return;
-							prikaziDetaljeKnjige(knjiga);
-						});
-
-						row.querySelector(".autor").addEventListener("click", () => {
-							if (editModUkljucen) return;
-							prikaziAutora(knjiga.autor);
-						});
+								prikaziDetaljeKnjige(knjiga.id);
+							});
 
 							tbody.appendChild(row);
-			
 						});
+					})
+					.catch(err => {
+						console.error("Greška pri učitavanju knjiga:", err);
 					});
 			}
-			
-			
-
 
 			
 
@@ -173,15 +187,7 @@
 			  tbody.innerHTML = "";
 			  rows.forEach(row => tbody.appendChild(row));
 			}
-
-
-
-
-
-
-
-
-			
+		
 			
 			const modal = document.getElementById("modal");
 			const btnPrikaziFormu = document.getElementById("btnPrikaziFormu");
@@ -596,53 +602,53 @@
 			});
 			
 			
-function uploadPdfFromModal() {
-  const fileInput = document.getElementById("modalPdfInput");
-  const customNameInput = document.getElementById("customPdfName");
+			function uploadPdfFromModal() {
+			const fileInput = document.getElementById("modalPdfInput");
+			const customNameInput = document.getElementById("customPdfName");
 
-  if (!fileInput || !fileInput.files.length) {
-    alert("Molimo izaberite PDF fajl za upload.");
-    return;
-  }
+			if (!fileInput || !fileInput.files.length) {
+				alert("Molimo izaberite PDF fajl za upload.");
+				return;
+			}
 
-  const file = fileInput.files[0];
-  if (file.type !== "application/pdf") {
-    alert("Dozvoljen je samo PDF fajl.");
-    return;
-  }
+			const file = fileInput.files[0];
+			if (file.type !== "application/pdf") {
+				alert("Dozvoljen je samo PDF fajl.");
+				return;
+			}
 
-  const customFileName = customNameInput.value.trim();
-  if (!customFileName) {
-    alert("Molimo unesite naziv fajla.");
-    return;
-  }
+			const customFileName = customNameInput.value.trim();
+			if (!customFileName) {
+				alert("Molimo unesite naziv fajla.");
+				return;
+			}
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("naziv", customFileName + ".pdf");
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("naziv", customFileName + ".pdf");
 
-  fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/upload-pdf`, {
-    method: "POST",
-    body: formData
-  })
-    .then(res => {
-      if (!res.ok) {
-        return res.text().then(text => { throw new Error(text) });
-      }
-      return res.text();
-    })
-    .then(msg => {
-      alert(msg);
-      prikaziPdfFajlove(aktivnaKnjigaId);
+			fetch(`http://localhost:8080/api/knjige/${aktivnaKnjigaId}/upload-pdf`, {
+				method: "POST",
+				body: formData
+			})
+				.then(res => {
+				if (!res.ok) {
+					return res.text().then(text => { throw new Error(text) });
+				}
+				return res.text();
+				})
+				.then(msg => {
+				alert(msg);
+				prikaziPdfFajlove(aktivnaKnjigaId);
 
-      // Reset
-      const modal = document.getElementById("detaljiModal");
-      if (modal) modal.style.display = "none";
-    })
-    .catch(err => {
-      alert("Greška pri uploadu: " + err.message);
-    });
-}
+				// Reset
+				const modal = document.getElementById("detaljiModal");
+				if (modal) modal.style.display = "none";
+				})
+				.catch(err => {
+				alert("Greška pri uploadu: " + err.message);
+				});
+			}
 
 			
 			
@@ -872,17 +878,8 @@ function uploadPdfFromModal() {
 								console.error("Greška pri učitavanju PDF fajlova:", err);
 								pdfLinkContainer.innerHTML = "<em>Greška pri učitavanju PDF fajlova.</em>";
 							});
-			}
-
-
-
-
-
-
-
-
-			
+			}			
 
 			ucitajKnjige();
 			
-			
+		
